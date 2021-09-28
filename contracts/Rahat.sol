@@ -41,17 +41,17 @@ contract Rahat is AccessControl,ERC1155Holder {
     RahatERC20 public erc20;
     RahatERC1155 public erc1155;
 	/// @notice track balances of each beneficiary phone
-	mapping(uint256 => uint256) public tokenBalance;
-	mapping(uint256 =>mapping(uint256 => uint256)) public itemBalance;
+	mapping(uint256 => uint256) public erc20Balance;
+	mapping(uint256 =>mapping(uint256 => uint256)) public erc1155Balance;
 
 
 	/// @notice track projectBalances
 	//bytes32[] public projectId;
 	EnumerableSet.Bytes32Set private projectId;
-	mapping(bytes32 => uint256) remainingProjectBalances;
-	mapping(bytes32 =>mapping(uint256 => uint256)) remainingProjectItemBalances;
+	mapping(bytes32 => uint256) remainingProjectErc20Balances;
+	mapping(bytes32 =>mapping(uint256 => uint256)) remainingProjectErc1155Balances;
 	mapping(bytes32 => EnumerableSet.AddressSet) projectMobilizers;
-    mapping(address => EnumerableSet.Bytes32Set) mobilizerProjects;
+  mapping(address => EnumerableSet.Bytes32Set) mobilizerProjects;
 
 
 
@@ -92,7 +92,7 @@ contract Rahat is AccessControl,ERC1155Holder {
 	}
 	modifier IsBeneficiary(uint256 _phone) {
 	    bytes32 _benId = findHash(_phone);
-		require(tokenBalance[_phone] != 0, 'RAHAT: No any token was issued to this number');
+		require(erc20Balance[_phone] != 0, 'RAHAT: No any token was issued to this number');
 		_;
 	}
 	modifier OnlyVendor {
@@ -137,22 +137,22 @@ contract Rahat is AccessControl,ERC1155Holder {
 	function suspendBeneficiary(uint256 _phone , bytes32 _projectId) public OnlyServer IsBeneficiary(_phone) {
 	  //  bytes32 _benId = findHash(_phone);
 
-		uint256 _balance = tokenBalance[_phone];
-		remainingProjectBalances[_projectId] += _balance;
+		uint256 _balance = erc20Balance[_phone];
+		remainingProjectErc20Balances[_projectId] += _balance;
 		adjustTokenDeduct(_phone, _balance);
 	}
 
 	/// @notice adds the token from beneficiary
 	function adjustTokenAdd(uint256 _phone, uint256 _amount) public OnlyAdmin {
 	   // bytes32 _benId = findHash(_phone);
-		tokenBalance[_phone] = tokenBalance[_phone] + _amount;
+		erc20Balance[_phone] = erc20Balance[_phone] + _amount;
 		//emit BalanceAdjusted(_phone, _amount, _reason);
 	}
 
 	/// @notice deducts the token from beneficiary
 	function adjustTokenDeduct(uint256 _phone, uint256 _amount) public OnlyAdmin IsBeneficiary(_phone) {
 	    //bytes32 _benId = findHash(_phone);
-		tokenBalance[_phone] = tokenBalance[_phone] - _amount;
+		erc20Balance[_phone] = erc20Balance[_phone] - _amount;
 		//emit BalanceAdjusted(_phone, _amount, _reason);
 	}
 	
@@ -161,14 +161,14 @@ contract Rahat is AccessControl,ERC1155Holder {
 	/// @notice adds the token from beneficiary
 	function adjustTokenAdd(uint256 _phone, uint256 _amount,uint256 _tokenId) public OnlyAdmin {
 	   // bytes32 _benId = findHash(_phone);
-		itemBalance[_phone][_tokenId] += _amount;
+		erc1155Balance[_phone][_tokenId] += _amount;
 		//emit BalanceAdjusted(_phone, _amount, _reason);
 	}
 
 	/// @notice deducts the token from beneficiary
 	function adjustTokenDeduct(uint256 _phone, uint256 _amount,uint256 _tokenId) public OnlyAdmin IsBeneficiary(_phone) {
 	  //  bytes32 _benId = findHash(_phone);
-		itemBalance[_phone][_tokenId] -= _amount;
+		erc1155Balance[_phone][_tokenId] -= _amount;
 		//emit BalanceAdjusted(_phone, _amount, _reason);
 	}
 
@@ -178,7 +178,7 @@ contract Rahat is AccessControl,ERC1155Holder {
 	/// @param _projectCapital amount of budget to be assigned to project
 	function addProject(bytes32 _projectId, uint256 _projectCapital) external {
 		projectId.add(_projectId);
-		remainingProjectBalances[_projectId] = _projectCapital;
+		remainingProjectErc20Balances[_projectId] = _projectCapital;
 	}
 
 	/// @notice update a project balance.
@@ -186,22 +186,22 @@ contract Rahat is AccessControl,ERC1155Holder {
 	/// @param _projectId Id of the project to assign budget
 	/// @param _projectCapital amount of budget to be added to project
 	function updateProjectBudget(bytes32 _projectId, uint256 _projectCapital) external {
-		remainingProjectBalances[_projectId] += _projectCapital;
+		remainingProjectErc20Balances[_projectId] += _projectCapital;
 	}
 	
 	
 	function updateProjectBudget(bytes32 _projectId, uint256 _projectCapital,uint256 tokenId) external {
-		remainingProjectItemBalances[_projectId][tokenId] += _projectCapital;
+		remainingProjectErc1155Balances[_projectId][tokenId] += _projectCapital;
 	}
 
 	/// @notice get the current balance of project
 	function getProjectBalance(bytes32 _projectId) external view returns (uint256 _balance) {
-		return remainingProjectBalances[_projectId];
+		return remainingProjectErc20Balances[_projectId];
 	}
 	
 		/// @notice get the current balance of project
 	function getProjectBalance(bytes32 _projectId, uint256 tokenId) external view returns (uint256 _balance) {
-		return remainingProjectItemBalances[_projectId][tokenId];
+		return remainingProjectErc1155Balances[_projectId][tokenId];
 	}
 	
 	function verifyVendor(bytes32 _hash, bytes memory _signature) internal view returns(address){
@@ -227,8 +227,8 @@ contract Rahat is AccessControl,ERC1155Holder {
 		uint256 _amount
 	) public OnlyAdmin {
 		bytes32 _id = findHash(_projectId);
-		require(remainingProjectBalances[_id] >= _amount, 'RAHAT: Amount is greater than remaining Project Budget');
-		remainingProjectBalances[_id] -= _amount;
+		require(remainingProjectErc20Balances[_id] >= _amount, 'RAHAT: Amount is greater than remaining Project Budget');
+		remainingProjectErc20Balances[_id] -= _amount;
 		adjustTokenAdd(_phone, _amount);
 
 		emit Issued(_id, _phone, _amount);
@@ -241,8 +241,8 @@ contract Rahat is AccessControl,ERC1155Holder {
 		uint256 _tokenId
 	) public OnlyAdmin {
 		bytes32 _id = findHash(_projectId);
-		require(remainingProjectItemBalances[_id][_tokenId] >= _amount, 'RAHAT: Amount is greater than remaining Project Budget');
-		remainingProjectItemBalances[_id][_tokenId] -= _amount;
+		require(remainingProjectErc1155Balances[_id][_tokenId] >= _amount, 'RAHAT: Amount is greater than remaining Project Budget');
+		remainingProjectErc1155Balances[_id][_tokenId] -= _amount;
 		adjustTokenAdd(_phone, _amount,_tokenId);
 
 		emit Issued(_id, _phone, _amount);
@@ -262,8 +262,8 @@ contract Rahat is AccessControl,ERC1155Holder {
 
         
 		bytes32 _id = findHash(_projectId);
-		require(remainingProjectBalances[_id] >= _amount, 'RAHAT: Amount is greater than remaining Project Budget');
-		remainingProjectBalances[_id] -= _amount;
+		require(remainingProjectErc20Balances[_id] >= _amount, 'RAHAT: Amount is greater than remaining Project Budget');
+		remainingProjectErc20Balances[_id] -= _amount;
 		adjustTokenAdd(_phone, _amount);
 
 		emit Issued(_id, _phone, _amount);
@@ -284,8 +284,8 @@ contract Rahat is AccessControl,ERC1155Holder {
 
         
 		bytes32 _id = findHash(_projectId);
-		require(remainingProjectItemBalances[_id][_tokenId] >= _amount, 'RAHAT: Amount is greater than remaining Project Budget');
-		remainingProjectItemBalances[_id][_tokenId] -= _amount;
+		require(remainingProjectErc1155Balances[_id][_tokenId] >= _amount, 'RAHAT: Amount is greater than remaining Project Budget');
+		remainingProjectErc1155Balances[_id][_tokenId] -= _amount;
 		adjustTokenAdd(_phone, _amount,_tokenId);
 
 		emit Issued(_id, _phone, _amount);
@@ -305,7 +305,7 @@ contract Rahat is AccessControl,ERC1155Holder {
 		uint256 sum = getArraySum(_amount);
 		bytes32 _id = findHash(_projectId);
 
-		require(remainingProjectBalances[_id] >= sum, 'RAHAT: Amount is greater than remaining Project Budget');
+		require(remainingProjectErc20Balances[_id] >= sum, 'RAHAT: Amount is greater than remaining Project Budget');
 
 		for (i = 0; i < _phone.length; i++) {
 			issueToken(_projectId, _phone[i], _amount[i]);
@@ -317,7 +317,7 @@ contract Rahat is AccessControl,ERC1155Holder {
 	/// @param _tokens Number of tokens to request
 	function createClaim(uint256 _phone, uint256 _tokens) public IsBeneficiary(_phone) OnlyVendor {
 	    bytes32 _benId = findHash(_phone);
-		require(tokenBalance[_phone] >= _tokens, 'RAHAT: Amount requested is greater than beneficiary balance.');
+		require(erc20Balance[_phone] >= _tokens, 'RAHAT: Amount requested is greater than beneficiary balance.');
 		claim storage ac = recentClaims[msg.sender][_benId];
 		ac.isReleased = false;
 		ac.amount = _tokens;
@@ -328,7 +328,7 @@ contract Rahat is AccessControl,ERC1155Holder {
 	
 	function createClaim(uint256 _phone, uint256 _amount, uint256 _tokenId) public OnlyVendor {
 	    bytes32 _benId = findHash(_phone);
-		require(itemBalance[_phone][_tokenId] >= _amount, 'RAHAT: Amount requested is greater than beneficiary balance.');
+		require(erc1155Balance[_phone][_tokenId] >= _amount, 'RAHAT: Amount requested is greater than beneficiary balance.');
 		claim storage ac = recentItemClaims[msg.sender][_benId][_tokenId];
 		ac.isReleased = false;
 		ac.amount = _amount;
@@ -342,8 +342,8 @@ contract Rahat is AccessControl,ERC1155Holder {
         require(recoveredSigner == _signer,'Signature did not matched with signer');
         nonces[_signer]++;
 
-        bytes32 _benId = findHash(_phone);
-		require(tokenBalance[_phone] >= _amount, 'RAHAT: Amount requested is greater than beneficiary balance.');
+    bytes32 _benId = findHash(_phone);
+		require(erc20Balance[_phone] >= _amount, 'RAHAT: Amount requested is greater than beneficiary balance.');
 		claim storage ac = recentClaims[_signer][_benId];
 		ac.isReleased = false;
 		ac.amount = _amount;
@@ -359,7 +359,7 @@ contract Rahat is AccessControl,ERC1155Holder {
         nonces[_signer]++;
 	    
 	     bytes32 _benId = findHash(_phone);
-		require(itemBalance[_phone][_tokenId] >= _amount, 'RAHAT: Amount requested is greater than beneficiary balance.');
+		require(erc1155Balance[_phone][_tokenId] >= _amount, 'RAHAT: Amount requested is greater than beneficiary balance.');
 		claim storage ac = recentItemClaims[_signer][_benId][_tokenId];
 		ac.isReleased = false;
 		ac.amount = _amount;
@@ -421,7 +421,7 @@ contract Rahat is AccessControl,ERC1155Holder {
 		require(ac.date >= block.timestamp, 'RAHAT: Claim has already expired.');
 		bytes32 otpHash = findHash(_otp);
 		require(recentClaims[msg.sender][_benId].otpHash == otpHash, 'RAHAT: OTP did not match.');
-		tokenBalance[_phone] -= ac.amount;
+		erc20Balance[_phone] -= ac.amount;
 		uint256 amt = ac.amount;
 		ac.isReleased = false;
 		ac.amount = 0;
@@ -462,7 +462,7 @@ contract Rahat is AccessControl,ERC1155Holder {
 		require(ac.date >= block.timestamp, 'RAHAT: Claim has already expired.');
 		bytes32 otpHash = findHash(_otp);
 		require(recentClaims[msg.sender][_benId].otpHash == otpHash, 'RAHAT: OTP did not match.');
-		tokenBalance[_phone] -= ac.amount;
+		erc20Balance[_phone] -= ac.amount;
 		uint256 amt = ac.amount;
 		ac.isReleased = false;
 		ac.amount = 0;

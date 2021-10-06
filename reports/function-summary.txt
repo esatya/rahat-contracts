@@ -1,0 +1,329 @@
+
+Contract Context
+Contract vars: []
+Inheritance:: []
+ 
++--------------+------------+-----------+----------------+-------+----------------+----------------+
+|   Function   | Visibility | Modifiers |      Read      | Write | Internal Calls | External Calls |
++--------------+------------+-----------+----------------+-------+----------------+----------------+
+| _msgSender() |  internal  |     []    | ['msg.sender'] |   []  |       []       |       []       |
+|  _msgData()  |  internal  |     []    |  ['msg.data']  |   []  |       []       |       []       |
++--------------+------------+-----------+----------------+-------+----------------+----------------+
+
++-----------+------------+------+-------+----------------+----------------+
+| Modifiers | Visibility | Read | Write | Internal Calls | External Calls |
++-----------+------------+------+-------+----------------+----------------+
++-----------+------------+------+-------+----------------+----------------+
+
+
+Contract IERC20
+Contract vars: []
+Inheritance:: []
+ 
++---------------------------------------+------------+-----------+------+-------+----------------+----------------+
+|                Function               | Visibility | Modifiers | Read | Write | Internal Calls | External Calls |
++---------------------------------------+------------+-----------+------+-------+----------------+----------------+
+|             totalSupply()             |  external  |     []    |  []  |   []  |       []       |       []       |
+|           balanceOf(address)          |  external  |     []    |  []  |   []  |       []       |       []       |
+|       transfer(address,uint256)       |  external  |     []    |  []  |   []  |       []       |       []       |
+|       allowance(address,address)      |  external  |     []    |  []  |   []  |       []       |       []       |
+|        approve(address,uint256)       |  external  |     []    |  []  |   []  |       []       |       []       |
+| transferFrom(address,address,uint256) |  external  |     []    |  []  |   []  |       []       |       []       |
++---------------------------------------+------------+-----------+------+-------+----------------+----------------+
+
++-----------+------------+------+-------+----------------+----------------+
+| Modifiers | Visibility | Read | Write | Internal Calls | External Calls |
++-----------+------------+------+-------+----------------+----------------+
++-----------+------------+------+-------+----------------+----------------+
+
+
+Contract SafeMath
+Contract vars: []
+Inheritance:: []
+ 
++-----------------------------+------------+-----------+------+-------+--------------------------+----------------+
+|           Function          | Visibility | Modifiers | Read | Write |      Internal Calls      | External Calls |
++-----------------------------+------------+-----------+------+-------+--------------------------+----------------+
+|     add(uint256,uint256)    |  internal  |     []    |  []  |   []  | ['require(bool,string)'] |       []       |
+|     sub(uint256,uint256)    |  internal  |     []    |  []  |   []  |         ['sub']          |       []       |
+| sub(uint256,uint256,string) |  internal  |     []    |  []  |   []  | ['require(bool,string)'] |       []       |
+|     mul(uint256,uint256)    |  internal  |     []    |  []  |   []  | ['require(bool,string)'] |       []       |
+|     div(uint256,uint256)    |  internal  |     []    |  []  |   []  |         ['div']          |       []       |
+| div(uint256,uint256,string) |  internal  |     []    |  []  |   []  | ['require(bool,string)'] |       []       |
+|     mod(uint256,uint256)    |  internal  |     []    |  []  |   []  |         ['mod']          |       []       |
+| mod(uint256,uint256,string) |  internal  |     []    |  []  |   []  | ['require(bool,string)'] |       []       |
++-----------------------------+------------+-----------+------+-------+--------------------------+----------------+
+
++-----------+------------+------+-------+----------------+----------------+
+| Modifiers | Visibility | Read | Write | Internal Calls | External Calls |
++-----------+------------+------+-------+----------------+----------------+
++-----------+------------+------+-------+----------------+----------------+
+
+
+Contract Address
+Contract vars: []
+Inheritance:: []
+ 
++------------------------------------------------------+------------+-----------+----------+-------+-----------------------------------------------------+----------------------------------------+
+|                       Function                       | Visibility | Modifiers |   Read   | Write |                    Internal Calls                   |             External Calls             |
++------------------------------------------------------+------------+-----------+----------+-------+-----------------------------------------------------+----------------------------------------+
+|                 isContract(address)                  |  internal  |     []    |    []    |   []  |                          []                         |                   []                   |
+|              sendValue(address,uint256)              |  internal  |     []    | ['this'] |   []  |               ['require(bool,string)']              |  ['recipient.call{value: amount}()']   |
+|             functionCall(address,bytes)              |  internal  |     []    |    []    |   []  |                   ['functionCall']                  |                   []                   |
+|          functionCall(address,bytes,string)          |  internal  |     []    |    []    |   []  |              ['_functionCallWithValue']             |                   []                   |
+|     functionCallWithValue(address,bytes,uint256)     |  internal  |     []    |    []    |   []  |              ['functionCallWithValue']              |                   []                   |
+| functionCallWithValue(address,bytes,uint256,string)  |  internal  |     []    | ['this'] |   []  |  ['_functionCallWithValue', 'require(bool,string)'] |                   []                   |
+| _functionCallWithValue(address,bytes,uint256,string) |  private   |     []    |    []    |   []  |           ['mload(uint256)', 'isContract']          | ['target.call{value: weiValue}(data)'] |
+|                                                      |            |           |          |       | ['revert(uint256,uint256)', 'require(bool,string)'] |                                        |
+|                                                      |            |           |          |       |                  ['revert(string)']                 |                                        |
++------------------------------------------------------+------------+-----------+----------+-------+-----------------------------------------------------+----------------------------------------+
+
++-----------+------------+------+-------+----------------+----------------+
+| Modifiers | Visibility | Read | Write | Internal Calls | External Calls |
++-----------+------------+------+-------+----------------+----------------+
++-----------+------------+------+-------+----------------+----------------+
+
+
+Contract ERC20
+Contract vars: ['_balances', '_allowances', '_totalSupply', '_name', '_symbol', '_decimals']
+Inheritance:: ['IERC20', 'Context']
+ 
++-----------------------------------------------+------------+-----------+-------------------------------+-------------------------------+--------------------------------------------------+--------------------------------------------------------------------------------------------------------------+
+|                    Function                   | Visibility | Modifiers |              Read             |             Write             |                  Internal Calls                  |                                                External Calls                                                |
++-----------------------------------------------+------------+-----------+-------------------------------+-------------------------------+--------------------------------------------------+--------------------------------------------------------------------------------------------------------------+
+|                 totalSupply()                 |  external  |     []    |               []              |               []              |                        []                        |                                                      []                                                      |
+|               balanceOf(address)              |  external  |     []    |               []              |               []              |                        []                        |                                                      []                                                      |
+|           transfer(address,uint256)           |  external  |     []    |               []              |               []              |                        []                        |                                                      []                                                      |
+|           allowance(address,address)          |  external  |     []    |               []              |               []              |                        []                        |                                                      []                                                      |
+|            approve(address,uint256)           |  external  |     []    |               []              |               []              |                        []                        |                                                      []                                                      |
+|     transferFrom(address,address,uint256)     |  external  |     []    |               []              |               []              |                        []                        |                                                      []                                                      |
+|                  _msgSender()                 |  internal  |     []    |         ['msg.sender']        |               []              |                        []                        |                                                      []                                                      |
+|                   _msgData()                  |  internal  |     []    |          ['msg.data']         |               []              |                        []                        |                                                      []                                                      |
+|           constructor(string,string)          |   public   |     []    |               []              |     ['_decimals', '_name']    |                        []                        |                                                      []                                                      |
+|                                               |            |           |                               |          ['_symbol']          |                                                  |                                                                                                              |
+|                     name()                    |   public   |     []    |           ['_name']           |               []              |                        []                        |                                                      []                                                      |
+|                    symbol()                   |   public   |     []    |          ['_symbol']          |               []              |                        []                        |                                                      []                                                      |
+|                   decimals()                  |   public   |     []    |         ['_decimals']         |               []              |                        []                        |                                                      []                                                      |
+|                 totalSupply()                 |   public   |     []    |        ['_totalSupply']       |               []              |                        []                        |                                                      []                                                      |
+|               balanceOf(address)              |   public   |     []    |         ['_balances']         |               []              |                        []                        |                                                      []                                                      |
+|           transfer(address,uint256)           |   public   |     []    |               []              |               []              |           ['_transfer', '_msgSender']            |                                                      []                                                      |
+|           allowance(address,address)          |   public   |     []    |        ['_allowances']        |               []              |                        []                        |                                                      []                                                      |
+|            approve(address,uint256)           |   public   |     []    |               []              |               []              |            ['_msgSender', '_approve']            |                                                      []                                                      |
+|     transferFrom(address,address,uint256)     |   public   |     []    |        ['_allowances']        |               []              |           ['_transfer', '_msgSender']            |          ['_allowances[sender][_msgSender()].sub(amount,ERC20: transfer amount exceeds allowance)']          |
+|                                               |            |           |                               |                               |                   ['_approve']                   |                                                                                                              |
+|       increaseAllowance(address,uint256)      |   public   |     []    |        ['_allowances']        |               []              |            ['_msgSender', '_approve']            |                            ['_allowances[_msgSender()][spender].add(addedValue)']                            |
+|       decreaseAllowance(address,uint256)      |   public   |     []    |        ['_allowances']        |               []              |            ['_msgSender', '_approve']            |      ['_allowances[_msgSender()][spender].sub(subtractedValue,ERC20: decreased allowance below zero)']       |
+|       _transfer(address,address,uint256)      |  internal  |     []    |         ['_balances']         |         ['_balances']         | ['_beforeTokenTransfer', 'require(bool,string)'] | ['_balances[sender].sub(amount,ERC20: transfer amount exceeds balance)', '_balances[recipient].add(amount)'] |
+|             _mint(address,uint256)            |  internal  |     []    | ['_balances', '_totalSupply'] | ['_balances', '_totalSupply'] | ['_beforeTokenTransfer', 'require(bool,string)'] |                        ['_balances[account].add(amount)', '_totalSupply.add(amount)']                        |
+|             _burn(address,uint256)            |  internal  |     []    | ['_balances', '_totalSupply'] | ['_balances', '_totalSupply'] | ['_beforeTokenTransfer', 'require(bool,string)'] |      ['_balances[account].sub(amount,ERC20: burn amount exceeds balance)', '_totalSupply.sub(amount)']       |
+|       _approve(address,address,uint256)       |  internal  |     []    |               []              |        ['_allowances']        |             ['require(bool,string)']             |                                                      []                                                      |
+|             _setupDecimals(uint8)             |  internal  |     []    |               []              |         ['_decimals']         |                        []                        |                                                      []                                                      |
+| _beforeTokenTransfer(address,address,uint256) |  internal  |     []    |               []              |               []              |                        []                        |                                                      []                                                      |
++-----------------------------------------------+------------+-----------+-------------------------------+-------------------------------+--------------------------------------------------+--------------------------------------------------------------------------------------------------------------+
+
++-----------+------------+------+-------+----------------+----------------+
+| Modifiers | Visibility | Read | Write | Internal Calls | External Calls |
++-----------+------------+------+-------+----------------+----------------+
++-----------+------------+------+-------+----------------+----------------+
+
+
+Contract EnumerableSet
+Contract vars: []
+Inheritance:: []
+ 
++--------------------------------------------+------------+-----------+------+-------+--------------------------+-----------------------------+
+|                  Function                  | Visibility | Modifiers | Read | Write |      Internal Calls      |        External Calls       |
++--------------------------------------------+------------+-----------+------+-------+--------------------------+-----------------------------+
+|      _add(EnumerableSet.Set,bytes32)       |  private   |     []    |  []  |   []  |      ['_contains']       | ['set._values.push(value)'] |
+|     _remove(EnumerableSet.Set,bytes32)     |  private   |     []    |  []  |   []  |            []            |    ['set._values.pop()']    |
+|    _contains(EnumerableSet.Set,bytes32)    |  private   |     []    |  []  |   []  |            []            |              []             |
+|         _length(EnumerableSet.Set)         |  private   |     []    |  []  |   []  |            []            |              []             |
+|       _at(EnumerableSet.Set,uint256)       |  private   |     []    |  []  |   []  | ['require(bool,string)'] |              []             |
+|   add(EnumerableSet.AddressSet,address)    |  internal  |     []    |  []  |   []  |         ['_add']         |              []             |
+|  remove(EnumerableSet.AddressSet,address)  |  internal  |     []    |  []  |   []  |       ['_remove']        |              []             |
+| contains(EnumerableSet.AddressSet,address) |  internal  |     []    |  []  |   []  |      ['_contains']       |              []             |
+|      length(EnumerableSet.AddressSet)      |  internal  |     []    |  []  |   []  |       ['_length']        |              []             |
+|    at(EnumerableSet.AddressSet,uint256)    |  internal  |     []    |  []  |   []  |         ['_at']          |              []             |
+|     add(EnumerableSet.UintSet,uint256)     |  internal  |     []    |  []  |   []  |         ['_add']         |              []             |
+|   remove(EnumerableSet.UintSet,uint256)    |  internal  |     []    |  []  |   []  |       ['_remove']        |              []             |
+|  contains(EnumerableSet.UintSet,uint256)   |  internal  |     []    |  []  |   []  |      ['_contains']       |              []             |
+|       length(EnumerableSet.UintSet)        |  internal  |     []    |  []  |   []  |       ['_length']        |              []             |
+|     at(EnumerableSet.UintSet,uint256)      |  internal  |     []    |  []  |   []  |         ['_at']          |              []             |
++--------------------------------------------+------------+-----------+------+-------+--------------------------+-----------------------------+
+
++-----------+------------+------+-------+----------------+----------------+
+| Modifiers | Visibility | Read | Write | Internal Calls | External Calls |
++-----------+------------+------+-------+----------------+----------------+
++-----------+------------+------+-------+----------------+----------------+
+
+
+Contract AccessControl
+Contract vars: ['_roles', 'DEFAULT_ADMIN_ROLE']
+Inheritance:: ['Context']
+ 
++---------------------------------------+------------+-----------+----------------+------------------------+-------------------------------------+--------------------------------------------+
+|                Function               | Visibility | Modifiers |      Read      |         Write          |            Internal Calls           |               External Calls               |
++---------------------------------------+------------+-----------+----------------+------------------------+-------------------------------------+--------------------------------------------+
+|              _msgSender()             |  internal  |     []    | ['msg.sender'] |           []           |                  []                 |                     []                     |
+|               _msgData()              |  internal  |     []    |  ['msg.data']  |           []           |                  []                 |                     []                     |
+|        hasRole(bytes32,address)       |   public   |     []    |   ['_roles']   |           []           |                  []                 | ['_roles[role].members.contains(account)'] |
+|      getRoleMemberCount(bytes32)      |   public   |     []    |   ['_roles']   |           []           |                  []                 |     ['_roles[role].members.length()']      |
+|     getRoleMember(bytes32,uint256)    |   public   |     []    |   ['_roles']   |           []           |                  []                 |     ['_roles[role].members.at(index)']     |
+|         getRoleAdmin(bytes32)         |   public   |     []    |   ['_roles']   |           []           |                  []                 |                     []                     |
+|       grantRole(bytes32,address)      |   public   |     []    |   ['_roles']   |           []           |     ['_msgSender', '_grantRole']    |                     []                     |
+|                                       |            |           |                |                        | ['require(bool,string)', 'hasRole'] |                                            |
+|      revokeRole(bytes32,address)      |   public   |     []    |   ['_roles']   |           []           |    ['_msgSender', '_revokeRole']    |                     []                     |
+|                                       |            |           |                |                        | ['require(bool,string)', 'hasRole'] |                                            |
+|     renounceRole(bytes32,address)     |   public   |     []    |       []       |           []           |    ['_msgSender', '_revokeRole']    |                     []                     |
+|                                       |            |           |                |                        |       ['require(bool,string)']      |                                            |
+|      _setupRole(bytes32,address)      |  internal  |     []    |       []       |           []           |            ['_grantRole']           |                     []                     |
+|     _setRoleAdmin(bytes32,bytes32)    |  internal  |     []    |   ['_roles']   |       ['_roles']       |                  []                 |                     []                     |
+|      _grantRole(bytes32,address)      |  private   |     []    |   ['_roles']   |           []           |            ['_msgSender']           |   ['_roles[role].members.add(account)']    |
+|      _revokeRole(bytes32,address)     |  private   |     []    |   ['_roles']   |           []           |            ['_msgSender']           |  ['_roles[role].members.remove(account)']  |
+| slitherConstructorConstantVariables() |  internal  |     []    |       []       | ['DEFAULT_ADMIN_ROLE'] |                  []                 |                     []                     |
++---------------------------------------+------------+-----------+----------------+------------------------+-------------------------------------+--------------------------------------------+
+
++-----------+------------+------+-------+----------------+----------------+
+| Modifiers | Visibility | Read | Write | Internal Calls | External Calls |
++-----------+------------+------+-------+----------------+----------------+
++-----------+------------+------+-------+----------------+----------------+
+
+
+Contract AidToken
+Contract vars: ['_balances', '_allowances', '_totalSupply', '_name', '_symbol', '_decimals', 'owner']
+Inheritance:: ['ERC20', 'IERC20', 'Context']
+ 
++-----------------------------------------------+------------+---------------+-------------------------------+-------------------------------+--------------------------------------------------+--------------------------------------------------------------------------------------------------------------+
+|                    Function                   | Visibility |   Modifiers   |              Read             |             Write             |                  Internal Calls                  |                                                External Calls                                                |
++-----------------------------------------------+------------+---------------+-------------------------------+-------------------------------+--------------------------------------------------+--------------------------------------------------------------------------------------------------------------+
+|           constructor(string,string)          |   public   |       []      |               []              |     ['_decimals', '_name']    |                        []                        |                                                      []                                                      |
+|                                               |            |               |                               |          ['_symbol']          |                                                  |                                                                                                              |
+|                     name()                    |   public   |       []      |           ['_name']           |               []              |                        []                        |                                                      []                                                      |
+|                    symbol()                   |   public   |       []      |          ['_symbol']          |               []              |                        []                        |                                                      []                                                      |
+|                   decimals()                  |   public   |       []      |         ['_decimals']         |               []              |                        []                        |                                                      []                                                      |
+|                 totalSupply()                 |   public   |       []      |        ['_totalSupply']       |               []              |                        []                        |                                                      []                                                      |
+|               balanceOf(address)              |   public   |       []      |         ['_balances']         |               []              |                        []                        |                                                      []                                                      |
+|           transfer(address,uint256)           |   public   |       []      |               []              |               []              |           ['_msgSender', '_transfer']            |                                                      []                                                      |
+|           allowance(address,address)          |   public   |       []      |        ['_allowances']        |               []              |                        []                        |                                                      []                                                      |
+|            approve(address,uint256)           |   public   |       []      |               []              |               []              |            ['_msgSender', '_approve']            |                                                      []                                                      |
+|     transferFrom(address,address,uint256)     |   public   |       []      |        ['_allowances']        |               []              |            ['_msgSender', '_approve']            |          ['_allowances[sender][_msgSender()].sub(amount,ERC20: transfer amount exceeds allowance)']          |
+|                                               |            |               |                               |                               |                  ['_transfer']                   |                                                                                                              |
+|       increaseAllowance(address,uint256)      |   public   |       []      |        ['_allowances']        |               []              |            ['_msgSender', '_approve']            |                            ['_allowances[_msgSender()][spender].add(addedValue)']                            |
+|       decreaseAllowance(address,uint256)      |   public   |       []      |        ['_allowances']        |               []              |            ['_msgSender', '_approve']            |      ['_allowances[_msgSender()][spender].sub(subtractedValue,ERC20: decreased allowance below zero)']       |
+|       _transfer(address,address,uint256)      |  internal  |       []      |         ['_balances']         |         ['_balances']         | ['_beforeTokenTransfer', 'require(bool,string)'] | ['_balances[recipient].add(amount)', '_balances[sender].sub(amount,ERC20: transfer amount exceeds balance)'] |
+|             _mint(address,uint256)            |  internal  |       []      | ['_balances', '_totalSupply'] | ['_balances', '_totalSupply'] | ['_beforeTokenTransfer', 'require(bool,string)'] |                        ['_balances[account].add(amount)', '_totalSupply.add(amount)']                        |
+|             _burn(address,uint256)            |  internal  |       []      | ['_balances', '_totalSupply'] | ['_balances', '_totalSupply'] | ['_beforeTokenTransfer', 'require(bool,string)'] |      ['_balances[account].sub(amount,ERC20: burn amount exceeds balance)', '_totalSupply.sub(amount)']       |
+|       _approve(address,address,uint256)       |  internal  |       []      |               []              |        ['_allowances']        |             ['require(bool,string)']             |                                                      []                                                      |
+|             _setupDecimals(uint8)             |  internal  |       []      |               []              |         ['_decimals']         |                        []                        |                                                      []                                                      |
+| _beforeTokenTransfer(address,address,uint256) |  internal  |       []      |               []              |               []              |                        []                        |                                                      []                                                      |
+|                 totalSupply()                 |  external  |       []      |               []              |               []              |                        []                        |                                                      []                                                      |
+|               balanceOf(address)              |  external  |       []      |               []              |               []              |                        []                        |                                                      []                                                      |
+|           transfer(address,uint256)           |  external  |       []      |               []              |               []              |                        []                        |                                                      []                                                      |
+|           allowance(address,address)          |  external  |       []      |               []              |               []              |                        []                        |                                                      []                                                      |
+|            approve(address,uint256)           |  external  |       []      |               []              |               []              |                        []                        |                                                      []                                                      |
+|     transferFrom(address,address,uint256)     |  external  |       []      |               []              |               []              |                        []                        |                                                      []                                                      |
+|                  _msgSender()                 |  internal  |       []      |         ['msg.sender']        |               []              |                        []                        |                                                      []                                                      |
+|                   _msgData()                  |  internal  |       []      |          ['msg.data']         |               []              |                        []                        |                                                      []                                                      |
+|       constructor(string,string,address)      |   public   |       []      |         ['msg.sender']        |           ['owner']           |                  ['', '_mint']                   |                                                      []                                                      |
+|           mintToken(address,uint256)          |   public   | ['OnlyOwner'] |               []              |               []              |              ['OnlyOwner', '_mint']              |                                                      []                                                      |
++-----------------------------------------------+------------+---------------+-------------------------------+-------------------------------+--------------------------------------------------+--------------------------------------------------------------------------------------------------------------+
+
++-------------+------------+------------------------+-------+--------------------------+----------------+
+|  Modifiers  | Visibility |          Read          | Write |      Internal Calls      | External Calls |
++-------------+------------+------------------------+-------+--------------------------+----------------+
+| OnlyOwner() |  internal  | ['owner', 'tx.origin'] |   []  | ['require(bool,string)'] |       []       |
++-------------+------------+------------------------+-------+--------------------------+----------------+
+
+
+Contract Rahat
+Contract vars: ['_roles', 'DEFAULT_ADMIN_ROLE', 'SERVER_ROLE', 'VENDOR_ROLE', 'tokenContract', 'tokenBalance', 'projectId', 'remainingProjectBalances', 'recentClaims']
+Inheritance:: ['AccessControl', 'Context']
+ 
++----------------------------------------------+------------+---------------------------------+---------------------------------------+-------------------------------------------+--------------------------------------------+--------------------------------------------------+
+|                   Function                   | Visibility |            Modifiers            |                  Read                 |                   Write                   |               Internal Calls               |                  External Calls                  |
++----------------------------------------------+------------+---------------------------------+---------------------------------------+-------------------------------------------+--------------------------------------------+--------------------------------------------------+
+|           hasRole(bytes32,address)           |   public   |                []               |               ['_roles']              |                     []                    |                     []                     |    ['_roles[role].members.contains(account)']    |
+|         getRoleMemberCount(bytes32)          |   public   |                []               |               ['_roles']              |                     []                    |                     []                     |        ['_roles[role].members.length()']         |
+|        getRoleMember(bytes32,uint256)        |   public   |                []               |               ['_roles']              |                     []                    |                     []                     |        ['_roles[role].members.at(index)']        |
+|            getRoleAdmin(bytes32)             |   public   |                []               |               ['_roles']              |                     []                    |                     []                     |                        []                        |
+|          grantRole(bytes32,address)          |   public   |                []               |               ['_roles']              |                     []                    |         ['hasRole', '_msgSender']          |                        []                        |
+|                                              |            |                                 |                                       |                                           |   ['require(bool,string)', '_grantRole']   |                                                  |
+|         revokeRole(bytes32,address)          |   public   |                []               |               ['_roles']              |                     []                    |         ['hasRole', '_msgSender']          |                        []                        |
+|                                              |            |                                 |                                       |                                           |  ['_revokeRole', 'require(bool,string)']   |                                                  |
+|        renounceRole(bytes32,address)         |   public   |                []               |                   []                  |                     []                    |       ['_msgSender', '_revokeRole']        |                        []                        |
+|                                              |            |                                 |                                       |                                           |          ['require(bool,string)']          |                                                  |
+|         _setupRole(bytes32,address)          |  internal  |                []               |                   []                  |                     []                    |               ['_grantRole']               |                        []                        |
+|        _setRoleAdmin(bytes32,bytes32)        |  internal  |                []               |               ['_roles']              |                 ['_roles']                |                     []                     |                        []                        |
+|         _grantRole(bytes32,address)          |  private   |                []               |               ['_roles']              |                     []                    |               ['_msgSender']               |      ['_roles[role].members.add(account)']       |
+|         _revokeRole(bytes32,address)         |  private   |                []               |               ['_roles']              |                     []                    |               ['_msgSender']               |     ['_roles[role].members.remove(account)']     |
+|                 _msgSender()                 |  internal  |                []               |             ['msg.sender']            |                     []                    |                     []                     |                        []                        |
+|                  _msgData()                  |  internal  |                []               |              ['msg.data']             |                     []                    |                     []                     |                        []                        |
+|        constructor(AidToken,address)         |   public   |                []               | ['DEFAULT_ADMIN_ROLE', 'SERVER_ROLE'] |             ['tokenContract']             |        ['grantRole', '_setupRole']         |                        []                        |
+|                                              |            |                                 |     ['VENDOR_ROLE', 'msg.sender']     |                                           |             ['_setRoleAdmin']              |                                                  |
+|                                              |            |                                 |             ['tx.origin']             |                                           |                                            |                                                  |
+|              addAdmin(address)               |   public   |                []               |         ['DEFAULT_ADMIN_ROLE']        |                     []                    |               ['grantRole']                |                        []                        |
+|              addServer(address)              |   public   |                []               |            ['SERVER_ROLE']            |                     []                    |               ['grantRole']                |                        []                        |
+|              addVendor(address)              |   public   |                []               |            ['VENDOR_ROLE']            |                     []                    |               ['grantRole']                |                        []                        |
+|          suspendBeneficiary(uint64)          |   public   | ['OnlyServer', 'IsBeneficiary'] |            ['tokenBalance']           |                     []                    |      ['OnlyServer', 'IsBeneficiary']       |                        []                        |
+|                                              |            |                                 |                                       |                                           |           ['adjustTokenDeduct']            |                                                  |
+|        adjustTokenAdd(uint64,uint64)         |   public   |          ['OnlyAdmin']          |            ['tokenBalance']           |              ['tokenBalance']             |               ['OnlyAdmin']                |                        []                        |
+|       adjustTokenDeduct(uint64,uint64)       |   public   |  ['OnlyAdmin', 'IsBeneficiary'] |            ['tokenBalance']           |              ['tokenBalance']             |       ['IsBeneficiary', 'OnlyAdmin']       |                        []                        |
+|          addProject(bytes32,uint64)          |  external  |                []               |             ['projectId']             | ['projectId', 'remainingProjectBalances'] |                     []                     |          ['projectId.push(_projectId)']          |
+|     updateProjectBudget(bytes32,uint64)      |  external  |                []               |      ['remainingProjectBalances']     |        ['remainingProjectBalances']       |                     []                     |                        []                        |
+|          getProjectBalance(bytes32)          |  external  |                []               |      ['remainingProjectBalances']     |                     []                    |                     []                     |                        []                        |
+|       issueToken(string,uint64,uint64)       |   public   |          ['OnlyAdmin']          |      ['remainingProjectBalances']     |        ['remainingProjectBalances']       |       ['findHash', 'adjustTokenAdd']       |                        []                        |
+|                                              |            |                                 |                                       |                                           |   ['OnlyAdmin', 'require(bool,string)']    |                                                  |
+|   issueBulkToken(string,uint64[],uint64[])   |   public   |          ['OnlyAdmin']          |      ['remainingProjectBalances']     |                     []                    |         ['findHash', 'OnlyAdmin']          |                        []                        |
+|                                              |            |                                 |                                       |                                           |       ['getArraySum', 'issueToken']        |                                                  |
+|                                              |            |                                 |                                       |                                           |          ['require(bool,string)']          |                                                  |
+|          createClaim(uint64,uint64)          |   public   | ['IsBeneficiary', 'OnlyVendor'] |    ['recentClaims', 'tokenBalance']   |              ['recentClaims']             |      ['IsBeneficiary', 'OnlyVendor']       |                        []                        |
+|                                              |            |                                 |   ['block.timestamp', 'msg.sender']   |                                           |          ['require(bool,string)']          |                                                  |
+|                                              |            |                                 |             ['tx.origin']             |                                           |                                            |                                                  |
+| approveClaim(address,uint64,bytes32,uint256) |   public   | ['IsBeneficiary', 'OnlyServer'] |  ['recentClaims', 'block.timestamp']  |              ['recentClaims']             |      ['IsBeneficiary', 'OnlyServer']       |                        []                        |
+|                                              |            |                                 |                                       |                                           |          ['require(bool,string)']          |                                                  |
+|      getTokensFromClaim(uint64,string)       |   public   | ['IsBeneficiary', 'OnlyVendor'] |    ['recentClaims', 'tokenBalance']   |      ['recentClaims', 'tokenBalance']     |      ['IsBeneficiary', 'OnlyVendor']       | ['tokenContract.transfer(msg.sender,ac.amount)'] |
+|                                              |            |                                 |  ['tokenContract', 'block.timestamp'] |                                           |    ['findHash', 'require(bool,string)']    |                                                  |
+|                                              |            |                                 |             ['msg.sender']            |                                           |                                            |                                                  |
+|               findHash(string)               |  private   |                []               |                   []                  |                     []                    | ['abi.encodePacked()', 'keccak256(bytes)'] |           ['abi.encodePacked(_data)']            |
+|            getArraySum(uint64[])             |   public   |                []               |                   []                  |                     []                    |                     []                     |                        []                        |
+|    slitherConstructorConstantVariables()     |  internal  |                []               |                   []                  |   ['DEFAULT_ADMIN_ROLE', 'SERVER_ROLE']   |            ['keccak256(bytes)']            |                        []                        |
+|                                              |            |                                 |                                       |              ['VENDOR_ROLE']              |                                            |                                                  |
++----------------------------------------------+------------+---------------------------------+---------------------------------------+-------------------------------------------+--------------------------------------------+--------------------------------------------------+
+
++-----------------------+------------+--------------------------------------+-------+-------------------------------------+----------------+
+|       Modifiers       | Visibility |                 Read                 | Write |            Internal Calls           | External Calls |
++-----------------------+------------+--------------------------------------+-------+-------------------------------------+----------------+
+|      OnlyServer()     |  internal  |    ['SERVER_ROLE', 'msg.sender']     |   []  | ['hasRole', 'require(bool,string)'] |       []       |
+|      OnlyAdmin()      |  internal  | ['DEFAULT_ADMIN_ROLE', 'msg.sender'] |   []  | ['hasRole', 'require(bool,string)'] |       []       |
+| IsBeneficiary(uint64) |  internal  |           ['tokenBalance']           |   []  |       ['require(bool,string)']      |       []       |
+|      OnlyVendor()     |  internal  |    ['VENDOR_ROLE', 'msg.sender']     |   []  | ['hasRole', 'require(bool,string)'] |       []       |
++-----------------------+------------+--------------------------------------+-------+-------------------------------------+----------------+
+
+
+Contract RahatAdmin
+Contract vars: ['tokenContract', 'rahatContract', 'owner', 'projectId', 'projectExists', 'projectCapital']
+Inheritance:: []
+ 
++---------------------------------------------+------------+-------------------------------+-------------------------------------+----------------------------+--------------------------------------------+------------------------------------------------------------------------------------------------------------------------------+
+|                   Function                  | Visibility |           Modifiers           |                 Read                |           Write            |               Internal Calls               |                                                        External Calls                                                        |
++---------------------------------------------+------------+-------------------------------+-------------------------------------+----------------------------+--------------------------------------------+------------------------------------------------------------------------------------------------------------------------------+
+| constructor(AidToken,Rahat,uint256,address) |   public   |               []              |      ['tokenContract', 'this']      | ['owner', 'rahatContract'] |                     []                     |                                  ['tokenContract.mintToken(address(this),_intitialSupply)']                                  |
+|                                             |            |                               |                                     |     ['tokenContract']      |                                            |                                                                                                                              |
+|       setProjectBudget(string,uint64)       |   public   | ['OnlyOwner', 'CheckProject'] | ['projectCapital', 'rahatContract'] |     ['projectCapital']     |        ['findHash', 'CheckProject']        | ['rahatContract.updateProjectBudget(_id,_projectCapital)', 'tokenContract.transfer(address(rahatContract),_projectCapital)'] |
+|                                             |            |                               |          ['tokenContract']          |                            |               ['OnlyOwner']                |                                                                                                                              |
+|          getProjectBalance(string)          |   public   |         ['OnlyOwner']         |  ['projectExists', 'rahatContract'] |             []             |    ['findHash', 'require(bool,string)']    |                                           ['rahatContract.getProjectBalance(_id)']                                           |
+|                                             |            |                               |                                     |                            |               ['OnlyOwner']                |                                                                                                                              |
+|            withdrawToken(uint64)            |   public   |         ['OnlyOwner']         |   ['tokenContract', 'msg.sender']   |             []             |   ['OnlyOwner', 'require(bool,string)']    |                                        ['tokenContract.transfer(msg.sender,_amount)']                                        |
+|          mintToken(address,uint256)         |   public   |         ['OnlyOwner']         |          ['tokenContract']          |             []             |               ['OnlyOwner']                |                                        ['tokenContract.mintToken(_address,_amount)']                                         |
+|              addOwner(address)              |   public   |         ['OnlyOwner']         |                  []                 |         ['owner']          |               ['OnlyOwner']                |                                                              []                                                              |
+|               findHash(string)              |  private   |               []              |                  []                 |             []             | ['abi.encodePacked()', 'keccak256(bytes)'] |                                                 ['abi.encodePacked(_data)']                                                  |
++---------------------------------------------+------------+-------------------------------+-------------------------------------+----------------------------+--------------------------------------------+------------------------------------------------------------------------------------------------------------------------------+
+
++----------------------+------------+--------------------------------+--------------------------------+--------------------------+-------------------------+
+|      Modifiers       | Visibility |              Read              |             Write              |      Internal Calls      |      External Calls     |
++----------------------+------------+--------------------------------+--------------------------------+--------------------------+-------------------------+
+|     OnlyOwner()      |  internal  |    ['owner', 'msg.sender']     |               []               | ['require(bool,string)'] |            []           |
+| CheckProject(string) |  internal  | ['projectExists', 'projectId'] | ['projectExists', 'projectId'] |       ['findHash']       | ['projectId.push(_id)'] |
++----------------------+------------+--------------------------------+--------------------------------+--------------------------+-------------------------+
+
+./flat/RahatAdminFlat.sol analyzed (10 contracts)

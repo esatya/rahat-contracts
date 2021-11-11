@@ -12,6 +12,7 @@ import '@openzeppelin/contracts/access/AccessControl.sol';
 
 contract RahatERC20 is ERC20,ERC20Snapshot,ERC20Burnable{    
     
+	///@dev owner of the ERC20 contract 
 	mapping(address => bool) public owner;
 
 	modifier OnlyOwner {
@@ -30,11 +31,13 @@ contract RahatERC20 is ERC20,ERC20Snapshot,ERC20Burnable{
 	}
 	
 
-	function mintToken(address _address, uint256 _amount) public OnlyOwner returns (uint256) {
+	///@dev Mint x amount of ERC20 token to given address
+	///@param _address Address to which ERC20 token will be minted
+	///@param _amount Amount of token to be minted
+	function mintERC20(address _address, uint256 _amount) public OnlyOwner returns (uint256) {
 		_mint(_address, _amount);
 		return _amount;
 	}
-
 
 	function _beforeTokenTransfer(address from, address to, uint256 amount)
         internal
@@ -43,6 +46,4 @@ contract RahatERC20 is ERC20,ERC20Snapshot,ERC20Burnable{
         super._beforeTokenTransfer(from, to, amount);
     }
     
-    
-
 }

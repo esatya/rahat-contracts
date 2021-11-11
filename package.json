@@ -9,14 +9,16 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy-binance": "truffle deploy --network binance",
-    "verify-binance": "truffle run verify LotteryNFT@{contract-address} --network binance"
+    "verify-binance": "truffle run verify LotteryNFT@{contract-address} --network binance",
+    "compile": "truffle compile"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.3.1",
     "@truffle/hdwallet-provider": "^1.4.0",
     "dotenv": "^10.0.0",
     "ethers": "^5.4.7",
-    "truffle-flattener": "^1.5.0"
+    "truffle-flattener": "^1.5.0",
+    "truffle":"5.4.18"
   },
   "devDependencies": {
     "truffle-plugin-verify": "^0.5.9"

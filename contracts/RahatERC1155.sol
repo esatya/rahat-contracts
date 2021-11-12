@@ -33,8 +33,11 @@ contract RahatERC1155 is ERC1155,ERC1155Supply,ERC1155Burnable{
 	}
 	
 
-	
-	function mintItem(	string memory _name,
+	///@dev Mint New NFT to the caller
+    ///@param _name name of NFT
+    ///@param _symbol symbol of NFT
+    ///@param _amount amount of NFT
+	function mintERC1155(	string memory _name,
 		string memory _symbol,uint256 _amount) public returns (uint256) {
 	   _itemIds.increment();
 	   uint256 newItemId = _itemIds.current();
@@ -45,20 +48,28 @@ contract RahatERC1155 is ERC1155,ERC1155Supply,ERC1155Burnable{
 	    return newItemId;
 	}
 	
+    ///@dev set the baseURI of NFT
+    ///@param newuri base URI(eg: https://ipfs.io/ipfs)
 	function setBaseURI(string memory newuri) public OnlyOwner {
         _setURI(newuri);
     }
     
+    ///@dev check if the given tokenId exists
+    ///@param _id ERC1155 tokenId
     function exists(uint256 _id) public view override returns(bool){
          return(_itemIds.current() >= _id);
     }
 
-	
-	function mintItem(uint256 _id,uint256 _amount) public {
+	///@dev mint ERC1155 token of given tokenId
+    ///@param _id ERC1155 tokenid
+    ///@param _amount amount of ERC1155 token to be minted 
+	function mintERC1155(uint256 _id,uint256 _amount) public {
 	    require(exists(_id),"token with given id doesn't exists");
 	    _mint(msg.sender, _id, _amount, "");
 	}
 	
+    ///@dev Get the token URI of given tokenId
+    ///@param _tokenId ERC1155 tokenId
 	function getTokenData(uint256 _tokenId) public view returns(string memory){
 	    return _toFullURI(uri(_tokenId),_tokenId);
 	}
@@ -79,7 +90,7 @@ contract RahatERC1155 is ERC1155,ERC1155Supply,ERC1155Burnable{
             );
     }
 	
-
+    
     function _mint(address account, uint256 id, uint256 amount, bytes memory data)
         internal
         override(ERC1155, ERC1155Supply)

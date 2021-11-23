@@ -7,18 +7,22 @@ import '@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol';
 import '@openzeppelin/contracts/utils/structs/EnumerableSet.sol';
 import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
 
+
 contract Rahat is AccessControl,ERC1155Holder {
     using Strings for uint256;
     using EnumerableSet for EnumerableSet.Bytes32Set;
     using EnumerableSet for EnumerableSet.AddressSet;
+    using EnumerableSet for EnumerableSet.UintSet;
     using ECDSA for bytes32;
 
 	//***** Events *********//
-	event Claimed(address indexed vendor, uint256 indexed phone, uint256 amount);
+	event ClaimedERC20(address indexed vendor, uint256 indexed beneficiary,uint256 amount);
+	event ClaimedERC1155(address indexed vendor, uint256 indexed beneficiary,uint256 indexed tokenId,uint256 amount);
 	event ClaimApproved(address indexed vendor, uint256 indexed phone, uint256 amount);
-	event Issued(bytes32 indexed projectId, uint256 indexed phone, uint256 amount);
-	event ClaimAcquired(address indexed vendor, uint256 indexed beneficiary,uint256 amount);
-	event ClaimAcquired(uint256 indexed tokenId,address indexed vendor, uint256 indexed beneficiary,uint256 amount);
+	event IssuedERC20(bytes32 indexed projectId, uint256 indexed phone, uint256 amount);
+	event IssuedERC1155(bytes32 indexed projectId, uint256 indexed phone, uint256 indexed tokenId, uint256 amount);
+	event ClaimAcquiredERC20(address indexed vendor, uint256 indexed beneficiary,uint256 amount);
+	event ClaimAcquiredERC1155(address indexed vendor, uint256 indexed beneficiary,uint256 indexed tokenId,uint256 amount);
 	event InvalidSignature(bytes signature,bytes32 digest, address expectedSigner,address recoveredSigner);
 
 	//event BalanceAdjusted(uint256 indexed phone, uint256 amount, string reason);
@@ -41,9 +45,16 @@ contract Rahat is AccessControl,ERC1155Holder {
 	//AidToke public tokenContract;
     RahatERC20 public erc20;
     RahatERC1155 public erc1155;
+    
+    ///@notice track total issued tokens of each benefiicary phone
+    mapping(uint256 => uint256) public erc20Issued; //phone=>balance
+    mapping(uint256 =>mapping(uint256 => uint256)) public erc1155Issued; //phone=>tokenid=>balance
+    mapping(uint256 => EnumerableSet.UintSet) beneficiaryTokenIds;
+
+    
 	/// @notice track balances of each beneficiary phone
-	mapping(uint256 => uint256) public erc20Balance;
-	mapping(uint256 =>mapping(uint256 => uint256)) public erc1155Balance;
+	mapping(uint256 => uint256) public erc20Balance; //phone=>balance
+	mapping(uint256 =>mapping(uint256 => uint256)) public erc1155Balance; //phone=>tokenid=>balance
 
 
 	/// @notice track projectBalances
@@ -52,9 +63,12 @@ contract Rahat is AccessControl,ERC1155Holder {
 	mapping(bytes32 => uint256) remainingProjectErc20Balances;
 	mapping(bytes32 =>mapping(uint256 => uint256)) remainingProjectErc1155Balances;
 	mapping(bytes32 => EnumerableSet.AddressSet) projectMobilizers;
-  mapping(address => EnumerableSet.Bytes32Set) mobilizerProjects;
-
-
+	mapping(bytes32 => EnumerableSet.AddressSet) projectVendors;
+	
+	mapping(address => uint256) public erc20IssuedBy;
+	mapping(address => EnumerableSet.UintSet) tokenIdsIssuedBy; // Address => tokenIds[]
+	mapping(address =>mapping(uint256 => uint256)) public erc1155IssuedBy; //Address => tokenId => balance
+  
 
 	struct claim {
 		uint256 amount;
@@ -127,12 +141,70 @@ contract Rahat is AccessControl,ERC1155Holder {
 
     	/// @notice add vendors
 	/// @param _account address of the new vendor
-	function addMobilizer(address _account,bytes32 _projectId) public {
+	function addMobilizer(address _account,string memory _projectId) public {
+	    bytes32 _id = findHash(_projectId);
 		grantRole(MOBILIZER_ROLE, _account);
-		projectMobilizers[_projectId].add(_account);
-		mobilizerProjects[_account].add(_projectId);
+		projectMobilizers[_id].add(_account);
+	
+	}
+	
+	function getTotalERC1155Issued(uint256 _phone) public view returns(uint256[] memory tokenIds,uint256[] memory balances) {
+	     uint256 i;
+        uint256 _totalERC1155 = beneficiaryTokenIds[_phone].length();
+        uint256[] memory _tokenIds = new uint256[](_totalERC1155);
+        uint256[] memory _balances = new uint256[](_totalERC1155);
+        
+        for (i=0;i<_totalERC1155;i++){
+            uint256 _tokenId = beneficiaryTokenIds[_phone].at(i);
+            uint256 _balance = erc1155Issued[_phone][_tokenId];
+            _tokenIds[i] = _tokenId;
+            _balances[i] = _balance;
+        }
+        
+        return (_tokenIds,_balances);
+	}
+	
+	function getTotalERC1155Balance(uint256 _phone) public view returns(uint256[] memory tokenIds,uint256[] memory balances) {
+	     uint256 i;
+        uint256 _totalERC1155 = beneficiaryTokenIds[_phone].length();
+        uint256[] memory _tokenIds = new uint256[](_totalERC1155);
+        uint256[] memory _balances = new uint256[](_totalERC1155);
+        
+        for (i=0;i<_totalERC1155;i++){
+            uint256 _tokenId = beneficiaryTokenIds[_phone].at(i);
+            uint256 _balance = erc1155Balance[_phone][_tokenId];
+            _tokenIds[i] = _tokenId;
+            _balances[i] = _balance;
+        }
+        
+        return (_tokenIds,_balances);
+	}
+	
+	function getTotalERC1155IssuedBy(address _address) public view returns(uint256[] memory tokenIds,uint256[] memory balances) {
+	    uint256 i;
+	    uint256 _totalERC1155 = tokenIdsIssuedBy[_address].length();
+	    uint256[] memory _tokenIds = new uint256[](_totalERC1155);
+        uint256[] memory _balances = new uint256[](_totalERC1155);
+        
+         for (i=0;i<_totalERC1155;i++){
+            uint256 _tokenId = tokenIdsIssuedBy[_address].at(i);
+            uint256 _balance = erc1155IssuedBy[_address][_tokenId];
+            _tokenIds[i] = _tokenId;
+            _balances[i] = _balance;
+        }
+        
+        return (_tokenIds,_balances);
 	}
 
+
+    function getTokenIdsOfBeneficiary(uint256 _phone) public view returns(uint256[] memory tokenIds){
+        return beneficiaryTokenIds[_phone].values();
+    }
+    
+    function getTokenIdsIssuedBy(address _address) public view returns(uint256[] memory tokenIds){
+        return tokenIdsIssuedBy[_address].values();
+    }
+        
 	function suspendMobilizer() public {
 
 	}
@@ -155,6 +227,7 @@ contract Rahat is AccessControl,ERC1155Holder {
 	function adjustTokenAdd(uint256 _phone, uint256 _amount) public OnlyAdmin {
 	   // bytes32 _benId = findHash(_phone);
 		erc20Balance[_phone] = erc20Balance[_phone] + _amount;
+		erc20Issued[_phone] = erc20Issued[_phone] + _amount;
 		//emit BalanceAdjusted(_phone, _amount, _reason);
 	}
 
@@ -171,6 +244,7 @@ contract Rahat is AccessControl,ERC1155Holder {
 	function adjustTokenAdd(uint256 _phone, uint256 _amount,uint256 _tokenId) public OnlyAdmin {
 	   // bytes32 _benId = findHash(_phone);
 		erc1155Balance[_phone][_tokenId] += _amount;
+		erc1155Issued[_phone][_tokenId] += _amount;
 		//emit BalanceAdjusted(_phone, _amount, _reason);
 	}
 
@@ -238,13 +312,19 @@ contract Rahat is AccessControl,ERC1155Holder {
 		string memory _projectId,
 		uint256 _phone,
 		uint256 _amount
-	) public OnlyAdmin {
+	) public OnlyAdminOrMobilizer {
 		bytes32 _id = findHash(_projectId);
+        
+        if(hasRole(MOBILIZER_ROLE, msg.sender)){
+		require(projectMobilizers[_id].contains(msg.sender));
+        }
+		erc20IssuedBy[msg.sender] += _amount; 
+
 		require(remainingProjectErc20Balances[_id] >= _amount, 'RAHAT: Amount is greater than remaining Project Budget');
 		remainingProjectErc20Balances[_id] -= _amount;
 		adjustTokenAdd(_phone, _amount);
 
-		emit Issued(_id, _phone, _amount);
+		emit IssuedERC20(_id, _phone, _amount);
 	}
 	
 	/// @notice Issue ERC20 tokens to beneficiary
@@ -255,15 +335,27 @@ contract Rahat is AccessControl,ERC1155Holder {
 	function issueERC1155ToBeneficiary(
 		string memory _projectId,
 		uint256 _phone,
-		uint256 _amount,
-		uint256 _tokenId
-	) public OnlyAdmin {
+		uint256[] memory _amount,
+		uint256[] memory _tokenId
+	) public OnlyAdminOrMobilizer {
 		bytes32 _id = findHash(_projectId);
-		require(remainingProjectErc1155Balances[_id][_tokenId] >= _amount, 'RAHAT: Amount is greater than remaining Project Budget');
-		remainingProjectErc1155Balances[_id][_tokenId] -= _amount;
-		adjustTokenAdd(_phone, _amount,_tokenId);
-
-		emit Issued(_id, _phone, _amount);
+		require(_amount.length == _tokenId.length, 'RAHAT: Invalid input arrays of Phone and Amount');
+		 if(hasRole(MOBILIZER_ROLE, msg.sender)){
+		require(projectMobilizers[_id].contains(msg.sender));
+        }
+		uint256 i;
+		for (i = 0; i < _tokenId.length; i++) {
+		  	require(remainingProjectErc1155Balances[_id][_tokenId[i]] >= _amount[i], 'RAHAT: Amount is greater than remaining Project Budget');
+		  	
+		  	tokenIdsIssuedBy[msg.sender].add(_tokenId[i]);
+		  	erc1155IssuedBy[msg.sender][_tokenId[i]] += _amount[i];
+		    remainingProjectErc1155Balances[_id][_tokenId[i]] -= _amount[i];
+		    adjustTokenAdd(_phone, _amount[i],_tokenId[i]);
+		    beneficiaryTokenIds[_phone].add(_tokenId[i]);
+		    emit IssuedERC1155(_id, _phone, _tokenId[i],_amount[i]);
+		}
+	
+		
 	}
 	
 	/// @notice Issue ERC20 to beneficiary
@@ -290,7 +382,7 @@ contract Rahat is AccessControl,ERC1155Holder {
 		remainingProjectErc20Balances[_id] -= _amount;
 		adjustTokenAdd(_phone, _amount);
 
-		emit Issued(_id, _phone, _amount);
+		emit IssuedERC20(_id, _phone, _amount);
 	}
 	
 		
@@ -320,14 +412,14 @@ contract Rahat is AccessControl,ERC1155Holder {
 		remainingProjectErc1155Balances[_id][_tokenId] -= _amount;
 		adjustTokenAdd(_phone, _amount,_tokenId);
 
-		emit Issued(_id, _phone, _amount);
+		emit IssuedERC1155(_id, _phone,_tokenId, _amount);
 	}
 
 	/// @notice Issue tokens to beneficiary in bulk
 	/// @param _projectId Id of the project beneficiary is involved in
 	/// @param _phone array of phone number of the beneficiary
 	/// @param _amount array of Amount of token to be assigned to beneficiary
-	function issueBulkToken(
+	function issueBulkERC20(
 		string memory _projectId,
 		uint256[] memory _phone,
 		uint256[] memory _amount
@@ -343,6 +435,33 @@ contract Rahat is AccessControl,ERC1155Holder {
 			issueERC20ToBeneficiary(_projectId, _phone[i], _amount[i]);
 		}
 	}
+	
+		/// @notice Issue tokens to beneficiary in bulk
+	/// @param _projectId Id of the project beneficiary is involved in
+	/// @param _phone array of phone number of the beneficiary
+	/// @param _amount array of Amount of token to be assigned to beneficiary
+	function issueBulkERC1155(
+		string memory _projectId,
+		uint256[] memory _phone,
+		uint256[] memory _amount,
+		uint256 _tokenId
+		
+	) public OnlyAdmin {
+		require(_phone.length == _amount.length, 'RAHAT: Invalid input arrays of Phone and Amount');
+		uint256 i;
+		uint256 sum = getArraySum(_amount);
+		bytes32 _id = findHash(_projectId);
+
+		require(remainingProjectErc1155Balances[_id][_tokenId] >= sum, 'RAHAT: Amount is greater than remaining Project Budget');
+
+		for (i = 0; i < _phone.length; i++) {
+		    uint[] memory  amt = new uint[](1);
+		    uint[] memory  tkd = new uint[](1);
+		    amt[0] = _amount[i];
+		    tkd[0] = _tokenId;
+			issueERC1155ToBeneficiary(_projectId, _phone[i], amt,tkd);
+		}
+	}
 
 	/// @notice request a token to beneficiary by vendor
 	/// @param _phone Phone number of beneficiary to whom token is requested
@@ -354,7 +473,7 @@ contract Rahat is AccessControl,ERC1155Holder {
 		ac.isReleased = false;
 		ac.amount = _tokens;
 		ac.date = block.timestamp;
-		emit Claimed(tx.origin, _phone, _tokens);
+		emit ClaimedERC20(tx.origin, _phone, _tokens);
 	}
 	
 	///@dev claim tokens from the beneficiary by vendor
@@ -368,7 +487,7 @@ contract Rahat is AccessControl,ERC1155Holder {
 		ac.isReleased = false;
 		ac.amount = _amount;
 		ac.date = block.timestamp;
-		emit Claimed(tx.origin, _phone, _amount);
+		emit ClaimedERC1155(tx.origin, _phone, _tokenId, _amount);
 	}
 	
 	///@dev delegate a createClaim transaction for ERC20
@@ -388,7 +507,7 @@ contract Rahat is AccessControl,ERC1155Holder {
 		ac.isReleased = false;
 		ac.amount = _amount;
 		ac.date = block.timestamp;
-		emit Claimed(tx.origin, _phone, _amount);
+		emit ClaimedERC20(tx.origin, _phone, _amount);
 	    
 	}
 	
@@ -411,7 +530,7 @@ contract Rahat is AccessControl,ERC1155Holder {
 		ac.isReleased = false;
 		ac.amount = _amount;
 		ac.date = block.timestamp;
-		emit Claimed(tx.origin, _phone, _amount);
+		emit ClaimedERC1155(tx.origin, _phone,_tokenId, _amount);
 	}
 	
 
@@ -476,13 +595,13 @@ contract Rahat is AccessControl,ERC1155Holder {
 		require(ac.date >= block.timestamp, 'RAHAT: Claim has already expired.');
 		bytes32 otpHash = findHash(_otp);
 		require(recentERC20Claims[msg.sender][_benId].otpHash == otpHash, 'RAHAT: OTP did not match.');
-		erc20Balance[_phone] -= ac.amount;
+		adjustTokenDeduct(_phone,ac.amount);
 		uint256 amt = ac.amount;
 		ac.isReleased = false;
 		ac.amount = 0;
 		ac.date = 0;
 	    erc20.transfer(msg.sender, amt);
-	    emit ClaimAcquired(msg.sender,_phone,amt);
+	    emit ClaimAcquiredERC20(msg.sender,_phone,amt);
 
 	}
 	
@@ -503,7 +622,7 @@ contract Rahat is AccessControl,ERC1155Holder {
 		ac.amount = 0;
 		ac.date = 0;
 		erc1155.safeTransferFrom(address(this),msg.sender,_tokenId, amt,'');
-		emit ClaimAcquired(_tokenId,msg.sender,_phone,amt);
+		emit ClaimAcquiredERC1155(msg.sender,_phone,_tokenId,amt);
 	}
 	
 	
@@ -531,7 +650,7 @@ contract Rahat is AccessControl,ERC1155Holder {
 		ac.amount = 0;
 		ac.date = 0;
 	    erc20.transfer(msg.sender, amt);
-	    emit ClaimAcquired(msg.sender,_phone,amt);
+	    emit ClaimAcquiredERC20(msg.sender,_phone,amt);
 
 	}
 	
@@ -559,7 +678,7 @@ contract Rahat is AccessControl,ERC1155Holder {
 		ac.amount = 0;
 		ac.date = 0;
 		erc1155.safeTransferFrom(address(this),msg.sender,_tokenId, amt,'');
-		emit ClaimAcquired(_tokenId,msg.sender,_phone,amt);
+		emit ClaimAcquiredERC1155(msg.sender,_phone,_tokenId,amt);
 	}
 
 	/// @notice generates the hash of the given string

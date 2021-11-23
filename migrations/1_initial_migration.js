@@ -4,39 +4,64 @@ const Rahat = artifacts.require('Rahat');
 const RahatAdmin = artifacts.require('RahatAdmin');
 
 module.exports = async function(deployer) {
-  await deployer.deploy(
-    RahatERC20,
-    'Rahat',
-    'RHT',
-    '0xcDEe632FB1Ba1B3156b36cc0bDabBfd821305e06'
-  );
-  const RahatERC20Deployed = await RahatERC20.deployed();
-  console.log(RahatERC20Deployed.address);
+  // await deployer.deploy(
+  //   RahatERC20,
+  //   'Rahat',
+  //   'RHT',
+  //   '0xcDEe632FB1Ba1B3156b36cc0bDabBfd821305e06'
+  // );
+  // const RahatERC20Deployed = await RahatERC20.deployed();
+  // console.log(RahatERC20Deployed.address);
 
-  await deployer.deploy(
-    RahatERC1155,
-    '0xcDEe632FB1Ba1B3156b36cc0bDabBfd821305e06'
-  );
-  const RahatERC1155Deployed = await RahatERC1155.deployed();
-  console.log(RahatERC1155Deployed.address);
+  // await deployer.deploy(
+  //   RahatERC1155,
+  //   '0xcDEe632FB1Ba1B3156b36cc0bDabBfd821305e06'
+  // );
+  // const RahatERC1155Deployed = await RahatERC1155.deployed();
+  // console.log(RahatERC1155Deployed.address);
 
-  await deployer.deploy(
-    Rahat,
-    RahatERC20Deployed.address,
-    RahatERC1155Deployed.address,
-    '0xcDEe632FB1Ba1B3156b36cc0bDabBfd821305e06'
-  );
+  // await deployer.deploy(
+  //   Rahat,
+  //   RahatERC20Deployed.address,
+  //   RahatERC1155Deployed.address,
+  //   '0xcDEe632FB1Ba1B3156b36cc0bDabBfd821305e06'
+  // );
 
-  const RahatDeployed = await Rahat.deployed();
+  
 
-  const RahatAdminDeployed = await deployer.deploy(
+  // const RahatDeployed = await Rahat.deployed();
+
+  // const RahatAdminDeployed = await deployer.deploy(
+  //   RahatAdmin,
+  //   RahatERC20Deployed.address,
+  //   RahatERC1155Deployed.address,
+  //   RahatDeployed.address,
+  //   '10000000000000000000',
+  //   '0xcDEe632FB1Ba1B3156b36cc0bDabBfd821305e06'
+  // );
+
+
+
+  // await deployer.deploy(
+  //   Rahat,
+  //   "0x8fBADa26355b00a509bA7520eAC0518Be76a04C8",
+  //   "0x32e932369374944840EAEB41D78BE8f911B57C98",
+  //   '0xcDEe632FB1Ba1B3156b36cc0bDabBfd821305e06'
+  // );
+
+  //   const RahatDeployed = await Rahat.deployed();
+
+    const RahatAdminDeployed = await deployer.deploy(
     RahatAdmin,
-    RahatERC20Deployed.address,
-    RahatERC1155Deployed.address,
-    RahatDeployed.address,
+    "0x8fBADa26355b00a509bA7520eAC0518Be76a04C8",
+    "0x32e932369374944840EAEB41D78BE8f911B57C98",
+    "0x584f35c6a1d0b75Ac8FE9aac3f73a7AE8982D1cF",
     '10000000000000000000',
     '0xcDEe632FB1Ba1B3156b36cc0bDabBfd821305e06'
   );
+
+  //0x49f650Ac8e0707d35B02d902b18fB3977B40138a
+
 
   //===============MAINNET=============
   // const swapper = await deployer.deploy(

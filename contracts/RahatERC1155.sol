@@ -28,7 +28,7 @@ contract RahatERC1155 is ERC1155,ERC1155Supply,ERC1155Burnable{
 		_;
 	}
 
-	constructor(address _admin) ERC1155("https://game.example/api/item/{id}.json") {
+	constructor(address _admin) ERC1155("https://ipfs.rumsan.com/ipfs") {
 		owner[_admin] = true;
 	}
 	

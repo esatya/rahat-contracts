@@ -11,6 +11,9 @@ import './Rahat.sol';
 /// @notice You can use this contract to manage Rahat tokens and projects
 /// @dev All function calls are only executed by contract owner
 contract RahatAdmin is ERC1155Holder {
+    
+    using EnumerableSet for EnumerableSet.UintSet;
+    
 	event ProjectERC20BudgetUpdated(bytes32 indexed projectId, uint256 projectCapital,string tag);
 	event ProjectERC1155BudgetUpdated(bytes32 indexed projectId, uint256 indexed tokenId, uint256 projectCapital,string tag);
 	event Minted(bool success);
@@ -22,16 +25,20 @@ contract RahatAdmin is ERC1155Holder {
     RahatERC1155 public erc1155;
 	Rahat public rahatContract;
 	mapping(address => bool) public owner;
+	//EnumerableSet.UintSet private tokenIds;
 
 	/// @notice list of projects
 	bytes32[] public projectId;
+	
+	//NFTs minted for each project
+    mapping(bytes32 => EnumerableSet.UintSet) ERC1155InProject;
 
 	/// @notice check if projectId exists or not;
 	mapping(bytes32 => bool) public projectExists;
 
 	/// @notice assign budgets to project
 	mapping(bytes32 => uint256) public projectERC20Capital;
-	mapping(bytes32 => mapping(uint256 => uint256)) projectERC1155Capital; // projectId => tokenId => balance
+	mapping(bytes32 => mapping(uint256 => uint256)) public projectERC1155Capital; // projectId => tokenId => balance
 
 	modifier OnlyOwner {
 		require(owner[msg.sender], 'RAHAT_ADMIN: Only Admin can execute this transaction');
@@ -103,14 +110,42 @@ contract RahatAdmin is ERC1155Holder {
 		CheckProject(_projectId)
 	{
 	    require(erc1155.exists(tokenId),"RahatAdmin: Token with given id doesn't exists");
+	    bytes32 _id = findHash(_projectId);
+	    if(!ERC1155InProject[_id].contains(tokenId)){
+	        ERC1155InProject[_id].add(tokenId);
+	    }
 	    
-		bytes32 _id = findHash(_projectId);
+		erc1155.mintERC1155(tokenId,_projectCapital);
 		projectERC1155Capital[_id][tokenId] += _projectCapital;
 		erc1155.safeTransferFrom(address(this),address(rahatContract),tokenId, _projectCapital,'');
 		rahatContract.updateProjectBudget(_id, _projectCapital,tokenId);
 
 		emit ProjectERC1155BudgetUpdated(_id,tokenId, _projectCapital,'add');
 	}
+
+	/// @notice allocate ERC1155 tokens to projects
+	/// @dev create token and allocate them to the given projectId, Creates project and transfer tokens to Rahat contract.
+	///@param _name name of NFT
+    ///@param _symbol symbol of NFT
+	/// @param _projectId Unique Id of Project
+	/// @param _projectCapital amount of ERC1155 token with _tokenId allocated to project
+	/// @param _projectCapital ERC1155 token ID
+	function createAndsetProjectBudget_ERC1155(string memory _name, string memory _symbol, string memory _projectId, uint256 _projectCapital)
+		public
+		OnlyOwner
+		CheckProject(_projectId)
+	{
+	    bytes32 _id = findHash(_projectId);
+	    uint256 tokenId = erc1155.mintERC1155(_name,_symbol,_projectCapital);
+	    
+	    ERC1155InProject[_id].add(tokenId);
+		projectERC1155Capital[_id][tokenId] += _projectCapital;
+		erc1155.safeTransferFrom(address(this),address(rahatContract),tokenId, _projectCapital,'');
+		rahatContract.updateProjectBudget(_id, _projectCapital,tokenId);
+
+		emit ProjectERC1155BudgetUpdated(_id,tokenId, _projectCapital,'add');
+	}
+	
 	
 
 		function revokeProjectBudget(string memory _projectId, uint256 _projectCapital)
@@ -147,7 +182,7 @@ contract RahatAdmin is ERC1155Holder {
 
 	/// @notice get the current balance of project
 	/// @param _projectId Unique Id of project
-	function getProjecERC20Balance(string memory _projectId) public view OnlyOwner returns (uint256 _balance) {
+	function getProjecERC20Balance(string memory _projectId) public view returns (uint256 _balance) {
 		bytes32 _id = findHash(_projectId);
 		require(projectExists[_id], 'RAHAT_ADMIN: Invalid ProjectID');
 		return (rahatContract.getProjectBalance(_id));
@@ -157,10 +192,33 @@ contract RahatAdmin is ERC1155Holder {
 	/// @notice get the current ERC1155 amount of given tokenId in the project
 	/// @param _projectId Unique Id of project
 	/// @param tokenId ERC1155 tokenID
-	function getProjectERC1155Balance(string memory _projectId,uint256 tokenId) public view OnlyOwner returns (uint256 _balance) {
+	function getProjectERC1155Balance(string memory _projectId,uint256 tokenId) public view returns (uint256 _balance) {
 		bytes32 _id = findHash(_projectId);
 		require(projectExists[_id], 'RAHAT_ADMIN: Invalid ProjectID');
 		return (rahatContract.getProjectBalance(_id,tokenId));
+	}
+	
+	function getProjectERC1155Balances(string memory _projectId) public view returns(uint256[] memory tokenIds, uint256[] memory balances){
+	    bytes32 _id = findHash(_projectId);
+        uint256 i;
+        uint256 _totalERC1155 = ERC1155InProject[_id].length();
+        uint256[] memory _tokenIds = new uint256[](_totalERC1155);
+        uint256[] memory _balances = new uint256[](_totalERC1155);
+        
+        for (i=0;i<_totalERC1155;i++){
+            uint256 _tokenId = ERC1155InProject[_id].at(i);
+            uint256 _balance = getProjectERC1155Balance(_projectId,_tokenId);
+            _tokenIds[i] = _tokenId;
+            _balances[i] = _balance;
+        }
+        
+        return (_tokenIds,_balances);
+	    
+	}
+	
+	function getAllTokenIdsOfProject(string memory _projectId) public view returns (uint256[] memory tokenIds){
+	     bytes32 _id = findHash(_projectId);
+	    return ERC1155InProject[_id].values();
 	}
 
 	// TODO:   //SANTOSH - Can't we take default error of transferring?

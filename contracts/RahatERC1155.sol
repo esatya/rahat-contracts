@@ -98,29 +98,29 @@ contract RahatERC1155 is ERC1155,ERC1155Supply,ERC1155Burnable{
 
 
  //RESOLVE REMIX ISSUES   
-    // function _mint(address account, uint256 id, uint256 amount, bytes memory data)
-    //     internal
-    //     override(ERC1155, ERC1155Supply)
-    // {
-    //     super._mint(account,id,amount,data);
-    // }
-    // function _mintBatch(address account, uint256[] memory ids, uint256[] memory amounts, bytes memory data)
-    //     internal
-    //     override(ERC1155, ERC1155Supply)
-    // {
-    //     super._mintBatch(account,ids,amounts,data);
-    // }
-    // function _burn(address account, uint256 id, uint256 amount)
-    //     internal
-    //     override(ERC1155, ERC1155Supply)
-    // {
-    //     super._burn(account,id,amount);
-    // }
-    // function _burnBatch(address account, uint256[] memory ids, uint256[] memory amounts)
-    //     internal
-    //     override(ERC1155, ERC1155Supply)
-    // {
-    //     super._burnBatch(account,ids,amounts);
-    // }
+    function _mint(address account, uint256 id, uint256 amount, bytes memory data)
+        internal
+        override(ERC1155, ERC1155Supply)
+    {
+        super._mint(account,id,amount,data);
+    }
+    function _mintBatch(address account, uint256[] memory ids, uint256[] memory amounts, bytes memory data)
+        internal
+        override(ERC1155, ERC1155Supply)
+    {
+        super._mintBatch(account,ids,amounts,data);
+    }
+    function _burn(address account, uint256 id, uint256 amount)
+        internal
+        override(ERC1155, ERC1155Supply)
+    {
+        super._burn(account,id,amount);
+    }
+    function _burnBatch(address account, uint256[] memory ids, uint256[] memory amounts)
+        internal
+        override(ERC1155, ERC1155Supply)
+    {
+        super._burnBatch(account,ids,amounts);
+    }
 
 }

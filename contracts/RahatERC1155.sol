@@ -1,11 +1,10 @@
-//SPDX-License-Identifier: UNLICENSED
+//SPDX-License-Identifier: LGPL-3.0
 pragma solidity 0.8.7;
 
 //ERC1155 Tokens
 import '@openzeppelin/contracts/token/ERC1155/ERC1155.sol';
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
 import '@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol';
-//import 'https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v4.3/contracts/token/ERC1155/extensions/ERC1155Pausable.sol';
 
 //Utils
 import "@openzeppelin/contracts/utils/Counters.sol";
@@ -89,8 +88,9 @@ contract RahatERC1155 is ERC1155,ERC1155Supply,ERC1155Burnable{
                 )
             );
     }
-	
-    
+
+
+ //RESOLVE REMIX ISSUES   
     function _mint(address account, uint256 id, uint256 amount, bytes memory data)
         internal
         override(ERC1155, ERC1155Supply)
@@ -115,4 +115,5 @@ contract RahatERC1155 is ERC1155,ERC1155Supply,ERC1155Burnable{
     {
         super._burnBatch(account,ids,amounts);
     }
+
 }

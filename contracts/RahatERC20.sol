@@ -1,10 +1,9 @@
-//SPDX-License-Identifier: UNLICENSED
+//SPDX-License-Identifier: LGPL-3.0
 pragma solidity 0.8.7;
 
 //ERC20 Tokens
 import '@openzeppelin/contracts/token/ERC20/extensions/ERC20Snapshot.sol';
 import '@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol';
-//import 'https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v4.3/contracts/token/ERC20/extensions/ERC20Pausable.sol';
 
 
 //Utils

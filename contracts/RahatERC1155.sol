@@ -1,11 +1,10 @@
-//SPDX-License-Identifier: UNLICENSED
+//SPDX-License-Identifier: LGPL-3.0
 pragma solidity 0.8.7;
 
 //ERC1155 Tokens
 import '@openzeppelin/contracts/token/ERC1155/ERC1155.sol';
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
 import '@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol';
-//import 'https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v4.3/contracts/token/ERC1155/extensions/ERC1155Pausable.sol';
 
 //Utils
 import "@openzeppelin/contracts/utils/Counters.sol";
@@ -90,29 +89,38 @@ contract RahatERC1155 is ERC1155,ERC1155Supply,ERC1155Burnable{
             );
     }
 	
-    
-    function _mint(address account, uint256 id, uint256 amount, bytes memory data)
+	function _beforeTokenTransfer(address operator, address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data)
         internal
         override(ERC1155, ERC1155Supply)
     {
-        super._mint(account,id,amount,data);
+       super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
     }
-    function _mintBatch(address account, uint256[] memory ids, uint256[] memory amounts, bytes memory data)
-        internal
-        override(ERC1155, ERC1155Supply)
-    {
-        super._mintBatch(account,ids,amounts,data);
-    }
-    function _burn(address account, uint256 id, uint256 amount)
-        internal
-        override(ERC1155, ERC1155Supply)
-    {
-        super._burn(account,id,amount);
-    }
-    function _burnBatch(address account, uint256[] memory ids, uint256[] memory amounts)
-        internal
-        override(ERC1155, ERC1155Supply)
-    {
-        super._burnBatch(account,ids,amounts);
-    }
+
+
+ //RESOLVE REMIX ISSUES   
+    // function _mint(address account, uint256 id, uint256 amount, bytes memory data)
+    //     internal
+    //     override(ERC1155, ERC1155Supply)
+    // {
+    //     super._mint(account,id,amount,data);
+    // }
+    // function _mintBatch(address account, uint256[] memory ids, uint256[] memory amounts, bytes memory data)
+    //     internal
+    //     override(ERC1155, ERC1155Supply)
+    // {
+    //     super._mintBatch(account,ids,amounts,data);
+    // }
+    // function _burn(address account, uint256 id, uint256 amount)
+    //     internal
+    //     override(ERC1155, ERC1155Supply)
+    // {
+    //     super._burn(account,id,amount);
+    // }
+    // function _burnBatch(address account, uint256[] memory ids, uint256[] memory amounts)
+    //     internal
+    //     override(ERC1155, ERC1155Supply)
+    // {
+    //     super._burnBatch(account,ids,amounts);
+    // }
+
 }

@@ -62,7 +62,7 @@ contract RahatERC1155 is ERC1155,ERC1155Supply,ERC1155Burnable{
 	///@dev mint ERC1155 token of given tokenId
     ///@param _id ERC1155 tokenid
     ///@param _amount amount of ERC1155 token to be minted 
-	function mintERC1155(uint256 _id,uint256 _amount) public {
+	function mintExistingERC1155(uint256 _id,uint256 _amount) public {
 	    require(exists(_id),"token with given id doesn't exists");
 	    _mint(msg.sender, _id, _amount, "");
 	}
@@ -89,6 +89,13 @@ contract RahatERC1155 is ERC1155,ERC1155Supply,ERC1155Burnable{
             );
     }
 
+
+	// function _beforeTokenTransfer(address operator, address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data)
+    //     internal
+    //     override(ERC1155, ERC1155Supply)
+    // {
+    //    super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
+    // }
 
  //RESOLVE REMIX ISSUES   
     function _mint(address account, uint256 id, uint256 amount, bytes memory data)

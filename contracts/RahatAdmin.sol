@@ -115,7 +115,7 @@ contract RahatAdmin is ERC1155Holder {
 	        ERC1155InProject[_id].add(tokenId);
 	    }
 	    
-		erc1155.mintERC1155(tokenId,_projectCapital);
+		erc1155.mintExistingERC1155(tokenId,_projectCapital);
 		projectERC1155Capital[_id][tokenId] += _projectCapital;
 		erc1155.safeTransferFrom(address(this),address(rahatContract),tokenId, _projectCapital,'');
 		rahatContract.updateProjectBudget(_id, _projectCapital,tokenId);

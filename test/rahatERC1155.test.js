@@ -36,11 +36,9 @@ describe("RahatERC1155 contract", function() {
 
     it("Should mint the ERC1155 tokens of given tokenID", async function() { 
      const initialTotalSupply = await rahatERC1155.totalSupply(1);
-     console.log(initialTotalSupply)
       await rahatERC1155.mintExistingERC1155(1,1000,{from:deployer});
 
       const finalTotalSupply = await rahatERC1155.totalSupply(1);
-     console.log({finalTotalSupply})
 
       assert.equal(finalTotalSupply.toNumber(),initialTotalSupply.toNumber()+1000)
 

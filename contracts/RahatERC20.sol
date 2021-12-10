@@ -45,4 +45,7 @@ contract RahatERC20 is ERC20,ERC20Snapshot,ERC20Burnable{
         super._beforeTokenTransfer(from, to, amount);
     }
     
+	function addOwner(address _account) public OnlyOwner {
+		owner[_account] = true;
+	}
 }

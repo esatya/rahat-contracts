@@ -90,6 +90,10 @@ contract RahatERC1155 is ERC1155,ERC1155Supply,ERC1155Burnable{
     }
 
 
+    function addOwner(address _account) public OnlyOwner {
+		owner[_account] = true;
+	}
+
 	// function _beforeTokenTransfer(address operator, address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data)
     //     internal
     //     override(ERC1155, ERC1155Supply)

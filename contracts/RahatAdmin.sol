@@ -148,37 +148,37 @@ contract RahatAdmin is ERC1155Holder {
 	
 	
 
-		function revokeProjectBudget(string memory _projectId, uint256 _projectCapital)
-		public
-		OnlyOwner
-		CheckProject(_projectId)
-	{
-		bytes32 _id = findHash(_projectId);
-		projectERC20Capital[_id] -= _projectCapital;
-	//	tokenContract.transfer(address(rahatContract), _projectCapital);
-		//rahatContract.updateProjectBudget(_id, _projectCapital);
+	// 	function revokeProjectBudget(string memory _projectId, uint256 _projectCapital)
+	// 	public
+	// 	OnlyOwner
+	// 	CheckProject(_projectId)
+	// {
+	// 	bytes32 _id = findHash(_projectId);
+	// 	projectERC20Capital[_id] -= _projectCapital;
+	// //	tokenContract.transfer(address(rahatContract), _projectCapital);
+	// 	//rahatContract.updateProjectBudget(_id, _projectCapital);
 
-		emit ProjectERC20BudgetUpdated(_id, _projectCapital,'deduct');
-	}
+	// 	emit ProjectERC20BudgetUpdated(_id, _projectCapital,'deduct');
+	// }
 	
-		function revokeProjectBudget(string memory _projectId, uint256 _projectCapital,uint256 tokenId)
-		public
-		OnlyOwner
-		CheckProject(_projectId)
-	{
-	    require(erc1155.exists(tokenId),"RahatAdmin: Token with given id doesn't exists");
+	// 	function revokeProjectBudget(string memory _projectId, uint256 _projectCapital,uint256 tokenId)
+	// 	public
+	// 	OnlyOwner
+	// 	CheckProject(_projectId)
+	// {
+	//     require(erc1155.exists(tokenId),"RahatAdmin: Token with given id doesn't exists");
 	    
-		bytes32 _id = findHash(_projectId);
-		projectERC1155Capital[_id][tokenId] += _projectCapital;
-	//	tokenContract.safeTransferFrom(address(this),address(rahatContract),tokenId, _projectCapital,'');
-	//	rahatContract.updateProjectBudget(_id, _projectCapital,tokenId);
+	// 	bytes32 _id = findHash(_projectId);
+	// 	projectERC1155Capital[_id][tokenId] += _projectCapital;
+	// //	tokenContract.safeTransferFrom(address(this),address(rahatContract),tokenId, _projectCapital,'');
+	// //	rahatContract.updateProjectBudget(_id, _projectCapital,tokenId);
 
-		emit ProjectERC1155BudgetUpdated(_id,tokenId, _projectCapital,'deduct');
-	}
+	// 	emit ProjectERC1155BudgetUpdated(_id,tokenId, _projectCapital,'deduct');
+	// }
 	
-	function suspendProject(string memory _projectId) public OnlyOwner CheckProject(_projectId){
+	// function suspendProject(string memory _projectId) public OnlyOwner CheckProject(_projectId){
 	    
-	}
+	// }
 
 	/// @notice get the current balance of project
 	/// @param _projectId Unique Id of project

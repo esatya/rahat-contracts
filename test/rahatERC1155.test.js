@@ -18,6 +18,17 @@ describe("RahatERC1155 contract", function() {
     });
   });
 
+
+  describe("ownership management",function() {
+
+    it('should add owner to the rahatERC20 contract',async function(){
+      await rahatERC1155.addOwner(addr1,{from:deployer});
+
+      assert.equal(await rahatERC1155.owner(addr1),true);
+    })
+  })
+
+
   describe("Mint ERC1155 Token", function() {
     it("Should Mint token to given address and increase supply", async function() {
       await rahatERC1155.mintERC1155('Test NFT','TNFT',1000,{from:addr1});

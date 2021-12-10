@@ -17,6 +17,15 @@ describe("RahatERC20 contract", function() {
     });
   });
 
+  describe("ownership management",function() {
+
+    it('should add owner to the rahatERC20 contract',async function(){
+      await rahatERC20.addOwner(addr1,{from:deployer});
+
+      assert.equal(await rahatERC20.owner(addr1),true);
+    })
+  })
+
   describe("Mint Token", function() {
     it("Should Mint token to given address", async function() {
       await rahatERC20.mintERC20(addr1,1000);
@@ -24,6 +33,13 @@ describe("RahatERC20 contract", function() {
       assert.equal(addr1Balance.toNumber(), 1000);
     });
     it("Should increase the supply of token", async function() { 
+      const initialSupply = await rahatERC20.totalSupply();
+      await rahatERC20.mintERC20(addr1,1000);
+      const finalSupply = await rahatERC20.totalSupply();
+      assert.equal(finalSupply.toNumber(), initialSupply.toNumber() + 1000);
+    });
+
+    it("Only owner can mint the token", async function() { 
       const initialSupply = await rahatERC20.totalSupply();
       await rahatERC20.mintERC20(addr1,1000);
       const finalSupply = await rahatERC20.totalSupply();

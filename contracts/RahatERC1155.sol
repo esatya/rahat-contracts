@@ -89,42 +89,43 @@ contract RahatERC1155 is ERC1155,ERC1155Supply,ERC1155Burnable{
             );
     }
 
-
     function addOwner(address _account) public OnlyOwner {
 		owner[_account] = true;
 	}
 
-	// function _beforeTokenTransfer(address operator, address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data)
+
+
+	function _beforeTokenTransfer(address operator, address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data)
+        internal
+        override(ERC1155, ERC1155Supply)
+    {
+       super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
+    }
+
+ //RESOLVE REMIX ISSUES   
+    // function _mint(address account, uint256 id, uint256 amount, bytes memory data)
     //     internal
     //     override(ERC1155, ERC1155Supply)
     // {
-    //    super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
+    //     super._mint(account,id,amount,data);
     // }
-
- //RESOLVE REMIX ISSUES   
-    function _mint(address account, uint256 id, uint256 amount, bytes memory data)
-        internal
-        override(ERC1155, ERC1155Supply)
-    {
-        super._mint(account,id,amount,data);
-    }
-    function _mintBatch(address account, uint256[] memory ids, uint256[] memory amounts, bytes memory data)
-        internal
-        override(ERC1155, ERC1155Supply)
-    {
-        super._mintBatch(account,ids,amounts,data);
-    }
-    function _burn(address account, uint256 id, uint256 amount)
-        internal
-        override(ERC1155, ERC1155Supply)
-    {
-        super._burn(account,id,amount);
-    }
-    function _burnBatch(address account, uint256[] memory ids, uint256[] memory amounts)
-        internal
-        override(ERC1155, ERC1155Supply)
-    {
-        super._burnBatch(account,ids,amounts);
-    }
+    // function _mintBatch(address account, uint256[] memory ids, uint256[] memory amounts, bytes memory data)
+    //     internal
+    //     override(ERC1155, ERC1155Supply)
+    // {
+    //     super._mintBatch(account,ids,amounts,data);
+    // }
+    // function _burn(address account, uint256 id, uint256 amount)
+    //     internal
+    //     override(ERC1155, ERC1155Supply)
+    // {
+    //     super._burn(account,id,amount);
+    // }
+    // function _burnBatch(address account, uint256[] memory ids, uint256[] memory amounts)
+    //     internal
+    //     override(ERC1155, ERC1155Supply)
+    // {
+    //     super._burnBatch(account,ids,amounts);
+    // }
 
 }

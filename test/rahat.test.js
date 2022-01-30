@@ -196,6 +196,75 @@ describe("Rahat contract", function() {
   })
 
 
+  describe('request tokens from vendor to beneficiary', function() {
+
+    it('should create erc20 token claim from vendor to beneficiary',async function() {
+      await rahat.createERC20Claim(phone1,1000,{from:vendor});
+      const phone1Hash = web3.utils.soliditySha3({type: 'string', value: phone1.toString()});
+      console.log(phone1Hash)
+      const claim = await rahat.recentERC20Claims(vendor,phone1Hash);
+      assert.equal(claim.amount,1000);
+      assert.equal(claim.isReleased,false);
+    })
+
+    it('should create erc1155 token claim from vendor to beneficiary',async function() {
+      await rahat.createERC1155Claim(phone1,1,1,{from:vendor});
+      const phone1Hash = web3.utils.soliditySha3({type: 'string', value: phone1.toString()});
+      console.log(phone1Hash)
+      const claim = await rahat.recentERC1155Claims(vendor,phone1Hash,1);
+      assert.equal(claim.amount,1);
+      assert.equal(claim.isReleased,false);
+    })
+  })
+
+  describe('Approve requested claims by setting OTP from server account', function() {
+
+    it('should approve erc20 token claim from server account',async function() {
+      await rahat.approveERC20Claim(vendor,phone1,otpHash,2000,{from:server});
+      const phone1Hash = web3.utils.soliditySha3({type: 'string', value: phone1.toString()});
+      console.log(phone1Hash)
+      const claim = await rahat.recentERC20Claims(vendor,phone1Hash);
+      assert.equal(claim.amount,1000);
+      assert.equal(claim.isReleased,true);
+      
+    })
+
+    it('should create erc1155 token claim from vendor to beneficiary',async function() {
+      await rahat.approveERC1155Claim(vendor,phone1,otpHash,2000,1,{from:server});
+      const phone1Hash = web3.utils.soliditySha3({type: 'string', value: phone1.toString()});
+      console.log(phone1Hash)
+      const claim = await rahat.recentERC1155Claims(vendor,phone1Hash,1);
+      assert.equal(claim.amount,1);
+      assert.equal(claim.isReleased,true);
+    })
+  })
+
+  describe('Should get tokens after entering correct OTP', function() {
+
+    it('should get erc20 tokens from claim made after entering otp set by server',async function() {
+
+      await rahat.getERC20FromClaim(phone1,otp,{from:vendor});
+      const phone1Hash = web3.utils.soliditySha3({type: 'string', value: phone1.toString()});
+      console.log(phone1Hash)
+      const claim = await rahat.recentERC20Claims(vendor,phone1Hash);
+      assert.equal(claim.amount,0);
+      assert.equal(claim.isReleased,false);
+
+    })
+
+
+    it('should get erc1155 tokens from claim made after entering otp set by server',async function() {
+
+      await rahat.getERC1155FromClaim(phone1,otp,1,{from:vendor});
+      const phone1Hash = web3.utils.soliditySha3({type: 'string', value: phone1.toString()});
+      console.log(phone1Hash)
+      const claim = await rahat.recentERC1155Claims(vendor,phone1Hash,1);
+      assert.equal(claim.amount,0);
+      assert.equal(claim.isReleased,false);
+
+    })
+
+  })
 
 
 });

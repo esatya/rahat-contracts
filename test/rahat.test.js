@@ -177,8 +177,11 @@ describe("Rahat contract", function() {
 
     it("should check all issued ERC1155 balances", async function(){
       const erc1155BalanceOfPhone2 = await rahat.getTotalERC1155Balance(phone2);
+      const tokenIdsOfBeneficiary = await rahat.getTokenIdsOfBeneficiary(phone2)
+      console.log({tokenIdsOfBeneficiary})
       assert.equal(erc1155BalanceOfPhone2.tokenIds[0],1)
       assert.equal(erc1155BalanceOfPhone2.balances[0],1)
+      assert.equal(tokenIdsOfBeneficiary[0],1)
 
     })
 
@@ -189,8 +192,11 @@ describe("Rahat contract", function() {
 
     it('should get total erc1155 issued by given address', async function() {
       const erc1155Issued = await rahat.getTotalERC1155IssuedBy(mobilizer);
+      const tokenIdsIssuedByMobilizer = await rahat.getTokenIdsIssuedBy(mobilizer);
+      console.log({tokenIdsIssuedByMobilizer});
       assert.equal(erc1155Issued.tokenIds[0],1)
       assert.equal(erc1155Issued.balances[0],1)
+      assert.equal(tokenIdsIssuedByMobilizer[0],1)
 
     })
   })

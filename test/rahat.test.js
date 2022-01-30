@@ -132,6 +132,70 @@ describe("Rahat contract", function() {
      });
   });
 
+  describe('Issue Tokens',function() {
+
+    it("should issue ERC20 token to beneficiary", async function() {
+      await rahat.issueERC20ToBeneficiary('project1',phone1,1000,{from:mobilizer});
+      const erc20BalanceOfPhone1 = await rahat.erc20Balance(phone1);
+      assert.equal(erc20BalanceOfPhone1,1000);
+    })
+
+    it("should issue ERC1155 token to beneficiary", async function() {
+      const project1TokenId = 1
+      await rahat.issueERC1155ToBeneficiary('project1',phone1,[1],[project1TokenId],{from:mobilizer});
+      const erc1155BalanceOfPhone1 = await rahat.erc1155Balance(phone1,project1TokenId);
+      assert.equal(erc1155BalanceOfPhone1,1);
+    })
+
+    it("should issue ERC20 token to beneficiary in bulk", async function(){
+
+      await rahat.issueBulkERC20('project1',[phone2,phone3],[1000,1000]);
+      const erc20BalanceOfPhone2 = await rahat.erc20Balance(phone2);
+      const erc20BalanceOfPhone3 = await rahat.erc20Balance(phone3);
+      const erc20IssuedToPhone2 = await rahat.erc20Issued(phone2);
+      const erc20IssuedToPhone3 = await rahat.erc20Issued(phone3);
+      assert.equal(erc20BalanceOfPhone2,1000); 
+      assert.equal(erc20BalanceOfPhone3,1000);
+      assert.equal(erc20IssuedToPhone2,1000); 
+      assert.equal(erc20IssuedToPhone3,1000); 
+ 
+    })
+
+    it("should issue ERC1155 token to beneficiary in bulk", async function(){
+
+      const project1TokenId = 1
+      await rahat.issueBulkERC1155('project1',[phone2,phone3],[1,1],project1TokenId);
+      const erc1155BalanceOfPhone2 = await rahat.erc1155Balance(phone2,project1TokenId);
+      const erc1155BalanceOfPhone3 = await rahat.erc1155Balance(phone3,project1TokenId);
+      const totalERC1155Issued = await rahat.getTotalERC1155Issued(phone2)
+      assert.equal(erc1155BalanceOfPhone2,1);
+      assert.equal(erc1155BalanceOfPhone3,1);
+      assert.equal(totalERC1155Issued.tokenIds[0],1)
+      assert.equal(totalERC1155Issued.balances[0],1)
+
+    })
+
+    it("should check all issued ERC1155 balances", async function(){
+      const erc1155BalanceOfPhone2 = await rahat.getTotalERC1155Balance(phone2);
+      assert.equal(erc1155BalanceOfPhone2.tokenIds[0],1)
+      assert.equal(erc1155BalanceOfPhone2.balances[0],1)
+
+    })
+
+  });
+
+
+  describe('check the tokens issued by mobilizer', function() {
+
+    it('should get total erc1155 issued by given address', async function() {
+      const erc1155Issued = await rahat.getTotalERC1155IssuedBy(mobilizer);
+      assert.equal(erc1155Issued.tokenIds[0],1)
+      assert.equal(erc1155Issued.balances[0],1)
+
+    })
+  })
+
+
 
 
 });

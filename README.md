@@ -1,5 +1,5 @@
 <p align="center">
-  <a href='https://coveralls.io/github/esatya/rahat-contracts?branch=stage'>'
+  <a href='https://coveralls.io/github/esatya/rahat-contracts?branch=stage'>
     <img src='https://coveralls.io/repos/github/esatya/rahat-contracts/badge.svg?branch=stage' alt='Coverage Status' />
   </a>
   <a href="https://github.com/esatya/rahat-contracts/blob/master/CONTRIBUTING.md">

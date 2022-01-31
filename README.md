@@ -1,7 +1,7 @@
 <p align="center">
- <a href='https://coveralls.io/github/esatya/rahat-contracts?branch=stage'>
-   <img src='https://coveralls.io/repos/github/esatya/rahat-contracts/badge.svg?branch=stage' alt='Coverage Status' /></a>
-
+  <a href='https://coveralls.io/github/esatya/rahat-contracts?branch=stage'>'
+    <img src='https://coveralls.io/repos/github/esatya/rahat-contracts/badge.svg?branch=stage' alt='Coverage Status' />
+  </a>
   <a href="https://github.com/esatya/rahat-contracts/blob/master/CONTRIBUTING.md">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome!" />
   </a>

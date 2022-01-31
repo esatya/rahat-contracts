@@ -41,6 +41,15 @@ describe("Rahat contract", function() {
     });
   });
 
+  describe('ownership management', function() {
+    it('should add owner',async function() {
+      await rahatAdmin.addOwner(addr1);
+      const isOwner = await rahatAdmin.owner(addr1);
+      assert.equal(isOwner,true)
+    })
+  })
+
+
   describe("Sets the Project Budget", function() {
     it("Should set the project ERC20 budget", async function() {   
         await rahatAdmin.setProjectBudget_ERC20('project1',10000);

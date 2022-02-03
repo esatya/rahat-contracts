@@ -3,6 +3,7 @@
 //TODO suspend mobilizer and vendor
 //TODO test tokenissue by mobilizer
 //TODO test otp set by server account and otp submission by vendor account
+//TODO revole roles
 
 pragma solidity 0.8.7;
 import "./RahatERC20.sol";
@@ -10,8 +11,9 @@ import "./RahatERC1155.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/utils/Multicall.sol";
 
-contract Rahat is AccessControl, ERC1155Holder {
+contract Rahat is AccessControl, ERC1155Holder, Multicall {
   using Strings for uint256;
   using EnumerableSet for EnumerableSet.Bytes32Set;
   using EnumerableSet for EnumerableSet.AddressSet;
@@ -184,19 +186,19 @@ contract Rahat is AccessControl, ERC1155Holder {
   //Access Control Management
   /// @notice add admin of the this contract
   /// @param _account address of the new admin
-  function addAdmin(address _account) public OnlyAdmin {
+  function addAdmin(address _account) external OnlyAdmin {
     grantRole(DEFAULT_ADMIN_ROLE, _account);
   }
 
   /// @notice add server account for this contract
   /// @param _account address of the new server account
-  function addServer(address _account) public OnlyAdmin {
+  function addServer(address _account) external OnlyAdmin {
     grantRole(SERVER_ROLE, _account);
   }
 
   /// @notice add vendors
   /// @param _account address of the new vendor
-  function addVendor(address _account) public OnlyAdmin {
+  function addVendor(address _account) external OnlyAdmin {
     grantRole(VENDOR_ROLE, _account);
   }
 
@@ -204,7 +206,7 @@ contract Rahat is AccessControl, ERC1155Holder {
   /// @param _account address of the new vendor
   /// @param _projectId projectId
   function addMobilizer(address _account, string memory _projectId)
-    public
+    external
     OnlyAdmin
   {
     bytes32 _id = findHash(_projectId);
@@ -212,6 +214,7 @@ contract Rahat is AccessControl, ERC1155Holder {
     projectMobilizers[_id].add(_account);
   }
 
+  //TODO replace with multicall
   function getTotalERC1155Issued(uint256 _phone)
     public
     view
@@ -232,6 +235,7 @@ contract Rahat is AccessControl, ERC1155Holder {
     return (_tokenIds, _balances);
   }
 
+  //TODO replace with multicall
   function getTotalERC1155Balance(uint256 _phone)
     public
     view
@@ -252,6 +256,7 @@ contract Rahat is AccessControl, ERC1155Holder {
     return (_tokenIds, _balances);
   }
 
+  //TODO replace with multicall
   function getTotalERC1155IssuedBy(address _address)
     public
     view
@@ -295,10 +300,10 @@ contract Rahat is AccessControl, ERC1155Holder {
   //Beneficiary Management
   /// @notice suspend the benficiary by deducting all the balance beneficiary owns
   /// @param _phone phone number of the Beneficiary
-  /// @param _projectId projectId of the beneficiary
+  /// @param _projectId projectId beneficiary is involved in
   function suspendBeneficiary(uint256 _phone, bytes32 _projectId)
     public
-    OnlyServer
+    OnlyAdmin
     IsBeneficiary(_phone)
   {
     //  bytes32 _benId = findHash(_phone);
@@ -309,7 +314,7 @@ contract Rahat is AccessControl, ERC1155Holder {
   }
 
   /// @notice adds the token from beneficiary
-  function adjustTokenAdd(uint256 _phone, uint256 _amount) internal {
+  function adjustTokenAdd(uint256 _phone, uint256 _amount) private {
     // bytes32 _benId = findHash(_phone);
     erc20Balance[_phone] = erc20Balance[_phone] + _amount;
     erc20Issued[_phone] = erc20Issued[_phone] + _amount;
@@ -318,7 +323,7 @@ contract Rahat is AccessControl, ERC1155Holder {
 
   /// @notice deducts the token from beneficiary
   function adjustTokenDeduct(uint256 _phone, uint256 _amount)
-    internal
+    private
     IsBeneficiary(_phone)
   {
     //bytes32 _benId = findHash(_phone);
@@ -331,7 +336,7 @@ contract Rahat is AccessControl, ERC1155Holder {
     uint256 _phone,
     uint256 _amount,
     uint256 _tokenId
-  ) internal {
+  ) private {
     // bytes32 _benId = findHash(_phone);
     erc1155Balance[_phone][_tokenId] += _amount;
     erc1155Issued[_phone][_tokenId] += _amount;
@@ -343,19 +348,10 @@ contract Rahat is AccessControl, ERC1155Holder {
     uint256 _phone,
     uint256 _amount,
     uint256 _tokenId
-  ) internal IsBeneficiary(_phone) {
+  ) private IsBeneficiary(_phone) {
     //  bytes32 _benId = findHash(_phone);
     erc1155Balance[_phone][_tokenId] -= _amount;
     //emit BalanceAdjusted(_phone, _amount, _reason);
-  }
-
-  /// @notice creates a project.
-  /// @notice called by rahatdmin contract
-  /// @param _projectId Id of the project to assign budget
-  /// @param _projectCapital amount of budget to be assigned to project
-  function addProject(bytes32 _projectId, uint256 _projectCapital) external {
-    projectId.add(_projectId);
-    remainingProjectErc20Balances[_projectId] = _projectCapital;
   }
 
   /// @notice update a project balance.
@@ -569,65 +565,6 @@ contract Rahat is AccessControl, ERC1155Holder {
 
   //   emit IssuedERC1155(_id, _phone, _tokenId, _amount);
   // }
-
-  /// @notice Issue tokens to beneficiary in bulk
-  /// @param _projectId Id of the project beneficiary is involved in
-  /// @param _phone array of phone number of the beneficiary
-  /// @param _amount array of Amount of token to be assigned to beneficiary
-  function issueBulkERC20(
-    string memory _projectId,
-    uint256[] memory _phone,
-    uint256[] memory _amount
-  ) public OnlyAdmin {
-    require(
-      _phone.length == _amount.length,
-      "RAHAT: Invalid input arrays of Phone and Amount"
-    );
-    uint256 i;
-    uint256 sum = getArraySum(_amount);
-    bytes32 _id = findHash(_projectId);
-
-    require(
-      remainingProjectErc20Balances[_id] >= sum,
-      "RAHAT: Amount is greater than remaining Project Budget"
-    );
-
-    for (i = 0; i < _phone.length; i++) {
-      issueERC20ToBeneficiary(_projectId, _phone[i], _amount[i]);
-    }
-  }
-
-  /// @notice Issue tokens to beneficiary in bulk
-  /// @param _projectId Id of the project beneficiary is involved in
-  /// @param _phone array of phone number of the beneficiary
-  /// @param _amount array of Amount of token to be assigned to beneficiary
-  function issueBulkERC1155(
-    string memory _projectId,
-    uint256[] memory _phone,
-    uint256[] memory _amount,
-    uint256 _tokenId
-  ) public OnlyAdmin {
-    require(
-      _phone.length == _amount.length,
-      "RAHAT: Invalid input arrays of Phone and Amount"
-    );
-    uint256 i;
-    uint256 sum = getArraySum(_amount);
-    bytes32 _id = findHash(_projectId);
-
-    require(
-      remainingProjectErc1155Balances[_id][_tokenId] >= sum,
-      "RAHAT: Amount is greater than remaining Project Budget"
-    );
-
-    for (i = 0; i < _phone.length; i++) {
-      uint256[] memory amt = new uint256[](1);
-      uint256[] memory tkd = new uint256[](1);
-      amt[0] = _amount[i];
-      tkd[0] = _tokenId;
-      issueERC1155ToBeneficiary(_projectId, _phone[i], amt, tkd);
-    }
-  }
 
   /// @notice request a token to beneficiary by vendor
   /// @param _phone Phone number of beneficiary to whom token is requested

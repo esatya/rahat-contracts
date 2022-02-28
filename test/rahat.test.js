@@ -2,7 +2,16 @@ const Rahat = artifacts.require("Rahat");
 const RahatERC20 = artifacts.require("RahatERC20");
 const RahatERC1155 = artifacts.require("RahatERC1155");
 const RahatAdmin = artifacts.require("RahatAdmin");
+const RahatABI = require("../artifacts/contracts/Rahat.sol/Rahat.json")
 
+
+const getInterface = (contractName,functionName) => {
+  const {abi}  = require(`../artifacts/contracts/${contractName}.sol/${contractName}`)
+  if(!abi) throw Error("Contract Not Found");
+  const interface = abi.find((el)=> el.name === functionName);
+  console.log({interface})
+  return interface 
+}
 
 describe("Rahat contract", function() {
   let rahatERC20;
@@ -22,7 +31,7 @@ describe("Rahat contract", function() {
 
 
   before(async function() {
-    [deployer,admin,server,vendor,manager,mobilizer] = await web3.eth.getAccounts();
+    [deployer,admin,server,vendor,manager,mobilizer,addr1] = await web3.eth.getAccounts();
     rahatERC20 = await RahatERC20.new("Rahat","RHT",deployer);
     rahatERC1155 = await RahatERC1155.new(deployer);
     rahat = await Rahat.new(rahatERC20.address,rahatERC1155.address,deployer)
@@ -88,20 +97,22 @@ describe("Rahat contract", function() {
         assert.equal(balance,0);
     })
 
+
+
   })
 
-  describe("add project with budget" , function() {
-    it("should add project with given project ID",async function() {
-      const projectId_1 = web3.utils.soliditySha3({type: 'string', value: 'rahatProject_1'});
-      await rahat.addProject(projectId_1,10000);
-      const projectBalance_token = await rahat.getProjectBalance(projectId_1);
-      const projectBalance_nft = await rahat.getProjectBalance(projectId_1,1);
+  // describe("add project with budget" , function() {
+  //   it("should add project with given project ID",async function() {
+  //     const projectId_1 = web3.utils.soliditySha3({type: 'string', value: 'rahatProject_1'});
+  //     await rahat.addProject(projectId_1,10000);
+  //     const projectBalance_token = await rahat.getProjectBalance(projectId_1);
+  //     const projectBalance_nft = await rahat.getProjectBalance(projectId_1,1);
 
-      assert.equal(projectBalance_token,10000);
-      assert.equal(projectBalance_nft,0);
+  //     assert.equal(projectBalance_token,10000);
+  //     assert.equal(projectBalance_nft,0);
 
-    })
-  })
+  //   })
+  // })
 
   describe("Sets the Project Budget", function() {
     it("Should set the project ERC20 budget", async function() {   
@@ -149,7 +160,9 @@ describe("Rahat contract", function() {
 
     it("should issue ERC20 token to beneficiary in bulk", async function(){
 
-      await rahat.issueBulkERC20('project1',[phone2,phone3],[1000,1000]);
+      const callData2 = web3.eth.abi.encodeFunctionCall(getInterface('Rahat','issueERC20ToBeneficiary'),['project1',phone2,1000]);
+      const callData3 = web3.eth.abi.encodeFunctionCall(getInterface('Rahat','issueERC20ToBeneficiary'),['project1',phone3,1000]);
+      await rahat.multicall([callData2,callData3])
       const erc20BalanceOfPhone2 = await rahat.erc20Balance(phone2);
       const erc20BalanceOfPhone3 = await rahat.erc20Balance(phone3);
       const erc20IssuedToPhone2 = await rahat.erc20Issued(phone2);
@@ -162,9 +175,10 @@ describe("Rahat contract", function() {
     })
 
     it("should issue ERC1155 token to beneficiary in bulk", async function(){
-
       const project1TokenId = 1
-      await rahat.issueBulkERC1155('project1',[phone2,phone3],[1,1],project1TokenId);
+      const callData2 = web3.eth.abi.encodeFunctionCall(getInterface('Rahat','issueERC1155ToBeneficiary'),['project1',phone2,[1],[project1TokenId]]);
+      const callData3 = web3.eth.abi.encodeFunctionCall(getInterface('Rahat','issueERC1155ToBeneficiary'),['project1',phone3,[1],[project1TokenId]]);
+      await rahat.multicall([callData2,callData3])
       const erc1155BalanceOfPhone2 = await rahat.erc1155Balance(phone2,project1TokenId);
       const erc1155BalanceOfPhone3 = await rahat.erc1155Balance(phone3,project1TokenId);
       const totalERC1155Issued = await rahat.getTotalERC1155Issued(phone2)
@@ -178,11 +192,24 @@ describe("Rahat contract", function() {
     it("should check all issued ERC1155 balances", async function(){
       const erc1155BalanceOfPhone2 = await rahat.getTotalERC1155Balance(phone2);
       const tokenIdsOfBeneficiary = await rahat.getTokenIdsOfBeneficiary(phone2)
-      console.log({tokenIdsOfBeneficiary})
       assert.equal(erc1155BalanceOfPhone2.tokenIds[0],1)
       assert.equal(erc1155BalanceOfPhone2.balances[0],1)
       assert.equal(tokenIdsOfBeneficiary[0],1)
 
+    })
+
+    it("should check balance through multicall" , async function() {
+      const callData1 = web3.eth.abi.encodeFunctionCall(getInterface('Rahat','erc20Balance'),[phone1]);
+      const callData2 = web3.eth.abi.encodeFunctionCall(getInterface('Rahat','erc20Balance'),[phone2]);
+      const callData3 = web3.eth.abi.encodeFunctionCall(getInterface('Rahat','erc20Balance'),[phone3]);
+      const results = await rahat.multicall.call([callData1,callData2,callData3]);
+      const balances = results.map((el) => {
+        const d = web3.eth.abi.decodeParameter('uint256',el)
+        return d;
+      })
+      balances.map((el) => {
+        assert.equal(el,1000)
+      })
     })
 
   });
@@ -193,7 +220,6 @@ describe("Rahat contract", function() {
     it('should get total erc1155 issued by given address', async function() {
       const erc1155Issued = await rahat.getTotalERC1155IssuedBy(mobilizer);
       const tokenIdsIssuedByMobilizer = await rahat.getTokenIdsIssuedBy(mobilizer);
-      console.log({tokenIdsIssuedByMobilizer});
       assert.equal(erc1155Issued.tokenIds[0],1)
       assert.equal(erc1155Issued.balances[0],1)
       assert.equal(tokenIdsIssuedByMobilizer[0],1)
@@ -207,7 +233,6 @@ describe("Rahat contract", function() {
     it('should create erc20 token claim from vendor to beneficiary',async function() {
       await rahat.createERC20Claim(phone1,1000,{from:vendor});
       const phone1Hash = web3.utils.soliditySha3({type: 'string', value: phone1.toString()});
-      console.log(phone1Hash)
       const claim = await rahat.recentERC20Claims(vendor,phone1Hash);
       assert.equal(claim.amount,1000);
       assert.equal(claim.isReleased,false);
@@ -216,7 +241,6 @@ describe("Rahat contract", function() {
     it('should create erc1155 token claim from vendor to beneficiary',async function() {
       await rahat.createERC1155Claim(phone1,1,1,{from:vendor});
       const phone1Hash = web3.utils.soliditySha3({type: 'string', value: phone1.toString()});
-      console.log(phone1Hash)
       const claim = await rahat.recentERC1155Claims(vendor,phone1Hash,1);
       assert.equal(claim.amount,1);
       assert.equal(claim.isReleased,false);
@@ -228,7 +252,6 @@ describe("Rahat contract", function() {
     it('should approve erc20 token claim from server account',async function() {
       await rahat.approveERC20Claim(vendor,phone1,otpHash,2000,{from:server});
       const phone1Hash = web3.utils.soliditySha3({type: 'string', value: phone1.toString()});
-      console.log(phone1Hash)
       const claim = await rahat.recentERC20Claims(vendor,phone1Hash);
       assert.equal(claim.amount,1000);
       assert.equal(claim.isReleased,true);
@@ -238,7 +261,6 @@ describe("Rahat contract", function() {
     it('should create erc1155 token claim from vendor to beneficiary',async function() {
       await rahat.approveERC1155Claim(vendor,phone1,otpHash,2000,1,{from:server});
       const phone1Hash = web3.utils.soliditySha3({type: 'string', value: phone1.toString()});
-      console.log(phone1Hash)
       const claim = await rahat.recentERC1155Claims(vendor,phone1Hash,1);
       assert.equal(claim.amount,1);
       assert.equal(claim.isReleased,true);
@@ -251,7 +273,6 @@ describe("Rahat contract", function() {
 
       await rahat.getERC20FromClaim(phone1,otp,{from:vendor});
       const phone1Hash = web3.utils.soliditySha3({type: 'string', value: phone1.toString()});
-      console.log(phone1Hash)
       const claim = await rahat.recentERC20Claims(vendor,phone1Hash);
       assert.equal(claim.amount,0);
       assert.equal(claim.isReleased,false);
@@ -263,7 +284,6 @@ describe("Rahat contract", function() {
 
       await rahat.getERC1155FromClaim(phone1,otp,1,{from:vendor});
       const phone1Hash = web3.utils.soliditySha3({type: 'string', value: phone1.toString()});
-      console.log(phone1Hash)
       const claim = await rahat.recentERC1155Claims(vendor,phone1Hash,1);
       assert.equal(claim.amount,0);
       assert.equal(claim.isReleased,false);

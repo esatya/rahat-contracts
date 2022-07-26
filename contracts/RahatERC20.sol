@@ -15,7 +15,7 @@ contract RahatERC20 is ERC20,ERC20Snapshot,ERC20Burnable{
 	mapping(address => bool) public owner;
 
 	modifier OnlyOwner {
-		require(owner[tx.origin], 'Only Admin can execute this transaction');
+		require(owner[msg.sender], 'Only Admin can execute this transaction');
 		_;
 	}
 

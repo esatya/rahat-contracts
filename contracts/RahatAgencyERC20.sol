@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: LGPL-3.0
-pragma solidity 0.8.7;
+pragma solidity 0.8.16;
 
 //ERC20 Tokens
 import '@openzeppelin/contracts/token/ERC20/extensions/ERC20Snapshot.sol';
@@ -22,11 +22,11 @@ contract RahatERC20 is ERC20,ERC20Snapshot,ERC20Burnable{
 	constructor(
 		string memory _name,
 		string memory _symbol,
-		address _admin
+		address _agencyContract
 	)  ERC20(_name, _symbol) {
 		owner[msg.sender] = true;
-		owner[_admin] = true;
-		_mint(msg.sender, 10000);
+		owner[_agencyContract] = true;
+		_mint(msg.sender, 100);
 	}
 	
 

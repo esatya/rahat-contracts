@@ -13,12 +13,12 @@ import '@openzeppelin/contracts/access/AccessControl.sol';
 import "../interfaces/IRahatAgencyToken.sol";
 
 contract RahatAgencyToken is ERC20, ERC20Snapshot, ERC20Burnable, IRahatAgencyToken{    
-    
+	uint256 snapshotid;
 	///@dev owner of the ERC20 contract 
 	mapping(address => bool) public owner;
 
 	modifier OnlyOwner {
-		require(owner[tx.origin], 'Only Admin can execute this transaction');
+		require(owner[tx.origin], 'Only RahatAdmin contract can execute this transaction');
 		_;
 	}
 
@@ -27,18 +27,21 @@ contract RahatAgencyToken is ERC20, ERC20Snapshot, ERC20Burnable, IRahatAgencyTo
 		string memory _symbol,
 		address _agencyContract
 	)  ERC20(_name, _symbol) {
-		owner[msg.sender] = true;
 		owner[_agencyContract] = true;
-		_mint(msg.sender, 100);
 	}
-	
 
 	///@dev Mint x amount of ERC20 token to given address
 	///@param _address Address to which ERC20 token will be minted
 	///@param _amount Amount of token to be minted
     function mintToken(address _address, uint256 _amount) public OnlyOwner override {
-        // require(acl.isBank(msg.sender), "Only bank allowed");
         ERC20._mint(_address, _amount);
+    }
+
+	///@notice Creates a new snapshot and returns it's id
+    function createSnapshot() public OnlyOwner returns (uint256 currentId) {
+        snapshotid = ERC20Snapshot._snapshot();
+        emit Snapshotcreated(snapshotid);
+        return snapshotid;
     }
 
 	function _beforeTokenTransfer(address from, address to, uint256 amount)
@@ -48,7 +51,7 @@ contract RahatAgencyToken is ERC20, ERC20Snapshot, ERC20Burnable, IRahatAgencyTo
         super._beforeTokenTransfer(from, to, amount);
     }
     
-	function addOwner(address _account) public OnlyOwner {
-		owner[_account] = true;
-	}
+	// function addOwner(address _account) public OnlyOwner {
+	// 	owner[_account] = true;
+	// }
 }

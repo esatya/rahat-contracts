@@ -7,38 +7,28 @@ import '@openzeppelin/contracts/token/ERC20/extensions/ERC20Snapshot.sol';
 import '@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol';
 
 //Utils
-import '@openzeppelin/contracts/access/AccessControl.sol';
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 //Interfaces
 import "../interfaces/IRahatAgencyToken.sol";
 
-contract RahatAgencyToken is ERC20, ERC20Snapshot, ERC20Burnable, IRahatAgencyToken{    
+contract RahatAgencyToken is ERC20, ERC20Snapshot, ERC20Burnable, Ownable, IRahatAgencyToken{    
 	uint256 snapshotid;
-	///@dev owner of the ERC20 contract 
-	mapping(address => bool) public owner;
-
-	modifier OnlyOwner {
-		require(owner[tx.origin], 'Only RahatAdmin contract can execute this transaction');
-		_;
-	}
 
 	constructor(
 		string memory _name,
-		string memory _symbol,
-		address _agencyContract
-	)  ERC20(_name, _symbol) {
-		owner[_agencyContract] = true;
-	}
+		string memory _symbol
+	)  ERC20(_name, _symbol) Ownable() {}
 
 	///@dev Mint x amount of ERC20 token to given address
 	///@param _address Address to which ERC20 token will be minted
 	///@param _amount Amount of token to be minted
-    function mintToken(address _address, uint256 _amount) public OnlyOwner override {
+    function mintToken(address _address, uint256 _amount) public onlyOwner override {
         ERC20._mint(_address, _amount);
     }
 
 	///@notice Creates a new snapshot and returns it's id
-    function createSnapshot() public OnlyOwner returns (uint256 currentId) {
+    function createSnapshot() public onlyOwner returns (uint256 currentId) {
         snapshotid = ERC20Snapshot._snapshot();
         emit Snapshotcreated(snapshotid);
         return snapshotid;
@@ -50,8 +40,9 @@ contract RahatAgencyToken is ERC20, ERC20Snapshot, ERC20Burnable, IRahatAgencyTo
     {
         super._beforeTokenTransfer(from, to, amount);
     }
-    
-	// function addOwner(address _account) public OnlyOwner {
-	// 	owner[_account] = true;
-	// }
+
+    function burn(uint256 amount) public override(ERC20Burnable, IRahatAgencyToken) {
+        ERC20Burnable.burn(amount);
+    }
+
 }

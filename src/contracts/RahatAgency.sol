@@ -83,7 +83,7 @@ contract RahatAgency {
   }
 
   // Misc token manage
-
+  
   function burnToken(uint256 _amount) public OnlyAdmin  {
     AgencyToken.burn(_amount);
   }

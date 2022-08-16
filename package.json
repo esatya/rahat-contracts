@@ -7,13 +7,12 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "deploy-binance": "truffle deploy --network binance",
     "deploy-rumsanTestnet": "truffle deploy --network rumsanTestnet",
     "verify-binance": "truffle run verify LotteryNFT@{contract-address} --network binance",
     "compile": "truffle compile",
     "test:contracts": "jest --runInBand --detectOpenHandles ./tests --coverage",
-    "test": "hardhat coverage"
+    "test": "hardhat test"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.3.1",

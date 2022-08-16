@@ -37,7 +37,7 @@ module.exports = {
    *
    * $ truffle test --network <network-name>
    */
-
+  contracts_directory: "./src/contracts",
   plugins: ['truffle-plugin-verify'],
   api_keys: {
     bscscan: BSCSCANAPIKEY,
@@ -58,7 +58,7 @@ module.exports = {
       network_id: '*', // Any network (default: none)
     },
     binanceTest: {
-      provider: function() {
+      provider: function () {
         return new HDWalletProvider({
           mnemonic: {
             phrase: TEST_MNEMONIC,
@@ -69,7 +69,7 @@ module.exports = {
       network_id: 97,
     },
     binanceMainnet: {
-      provider: function() {
+      provider: function () {
         return new HDWalletProvider({
           mnemonic: {
             phrase: MAIN_MNEMONIC,
@@ -83,7 +83,7 @@ module.exports = {
     },
 
     rinkeby: {
-      provider: function() {
+      provider: function () {
         return new HDWalletProvider({
           mnemonic: {
             phrase: TEST_MNEMONIC,
@@ -94,7 +94,7 @@ module.exports = {
       network_id: 4,
     },
     ethereum: {
-      provider: function() {
+      provider: function () {
         return new HDWalletProvider({
           mnemonic: {
             phrase: MAIN_MNEMONIC,
@@ -107,7 +107,7 @@ module.exports = {
       gasPrice: 42000000000,
     },
     polygonTestnet: {
-      provider: function() {
+      provider: function () {
         return new HDWalletProvider({
           mnemonic: {
             phrase: TEST_MNEMONIC,
@@ -118,7 +118,7 @@ module.exports = {
       network_id: 80001,
     },
     rumsanTestnet: {
-      provider: function() {
+      provider: function () {
         return new HDWalletProvider({
           mnemonic: {
             phrase: TEST_MNEMONIC,
@@ -163,7 +163,7 @@ module.exports = {
   // Configure your compilers
   compilers: {
     solc: {
-      version: '0.8.7', // Fetch exact version from solc-bin (default: truffle's version)
+      version: '0.8.16', // Fetch exact version from solc-bin (default: truffle's version)
       //docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
       settings: {
         // See the solidity docs for advice about optimization and evmVersion

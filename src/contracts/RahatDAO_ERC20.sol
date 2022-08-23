@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "../interfaces/IRahatDAO.sol";
 import "../interfaces/IRahatDAO_ERC20.sol";
 
-contract RahatDAOClaim is ReentrancyGuard, IRahatDAO_ERC20 {
+contract RahatDAO_ERC20 is ReentrancyGuard, IRahatDAO_ERC20 {
   IRahatDAO RahatDAO;
 
   mapping(address => mapping(address => uint256)) public beneficiariesTokens; // beno > token > balance
@@ -17,23 +17,26 @@ contract RahatDAOClaim is ReentrancyGuard, IRahatDAO_ERC20 {
 
   //#region Modifiers
   modifier OnlyManager() {
-    require(IRahatDAO.isAdmin(msg.sender), "RahatDAOClaim: Not a DAO manager.");
+    require(
+      RahatDAO.isManager(msg.sender),
+      "RahatDAOClaim: Not a DAO manager."
+    );
     _;
   }
 
   modifier OnlySystem() {
-    require(IRahatDAO.isSystem(msg.sender), "RahatDAOClaim: Need system role.");
+    require(RahatDAO.isSystem(msg.sender), "RahatDAOClaim: Need system role.");
     _;
   }
 
   modifier OnlyVendor() {
-    require(IRahatDAO.isVendor(msg.sender), "RahatDAOClaim: Not a vendor.");
+    require(RahatDAO.isVendor(msg.sender), "RahatDAOClaim: Not a vendor.");
     _;
   }
 
   modifier IsBeneficiary(address _address) {
     require(
-      IRahatDAO.isBeneficiary(_address),
+      RahatDAO.isBeneficiary(_address),
       "RahatDAOClaim: Not a verified beneficiary."
     );
     _;
@@ -65,7 +68,7 @@ contract RahatDAOClaim is ReentrancyGuard, IRahatDAO_ERC20 {
     address _beneficiary,
     uint256 _amount
   ) public OnlyManager nonReentrant {
-    this._deductToken(_token, _beneficiary, _amount);
+    _deductToken(_token, _beneficiary, _amount);
     unallocatedTokenBalance[_token] = unallocatedTokenBalance[_token] + _amount;
   }
 
@@ -91,32 +94,27 @@ contract RahatDAOClaim is ReentrancyGuard, IRahatDAO_ERC20 {
     view
     returns (uint256, address)
   {
-    address _address = IRahatDAO.getAddressFromPhone(_phone);
+    address _address = RahatDAO.getAddressFromPhone(_phone);
     return (beneficiariesTokens[_address][_token], _address);
   }
 
   //#endregion
 
   //#region Vendor Function
-  function getToken(
-    address _token,
+  function sendToken(
     address _beneficiary,
-    uint256 _amount,
-    string memory _pin
-  ) public IsBeneficiary(_beneficiary) nonReentrant OnlyVendor {
+    address _to,
+    address _token,
+    uint256 _amount
+  ) public IsBeneficiary(_beneficiary) nonReentrant OnlySystem {
     require(
       beneficiariesTokens[_beneficiary][_token] >= _amount,
       "RAHATDAO_ERC20: Amount requested is greater than beneficiary balance."
     );
 
-    require(
-      IRahatDAO.getBeneficiaryHash(_beneficiary) == findHash(_pin),
-      "RAHATDAO_ERC20: Incorrect beneficiary pin."
-    );
-
-    this._deductToken(_token, _beneficiary, _amount);
+    _deductToken(_token, _beneficiary, _amount);
     IERC20 token = IERC20(_token);
-    token.transfer(msg.sender, _amount);
+    token.transfer(_to, _amount);
 
     emit TokenTransferred(msg.sender, _beneficiary, _amount);
   }
@@ -131,12 +129,11 @@ contract RahatDAOClaim is ReentrancyGuard, IRahatDAO_ERC20 {
       "RAHATDAO_ERC20: Amount requested is greater than beneficiary balance."
     );
 
-    bytes32 _benId = findHash(_address);
-    Claim storage ac = claims[msg.sender][_benId];
+    Claim storage ac = claims[msg.sender][_address];
     ac.token = _token;
-    ac.isReleased = false;
+    ac.isApproved = false;
     ac.amount = _amount;
-    ac.date = block.timestamp;
+    ac.expireOn = block.timestamp;
     emit ClaimCreated(msg.sender, _address, _amount);
   }
 
@@ -147,19 +144,19 @@ contract RahatDAOClaim is ReentrancyGuard, IRahatDAO_ERC20 {
     uint256 _timeToLive
   ) public OnlySystem {
     Claim storage ac = claims[_vendor][_address];
-    require(ac.date != 0, "RAHATDAO_ERC20: Claim has not been created yet");
+    require(ac.expireOn != 0, "RAHATDAO_ERC20: Claim has not been created yet");
     require(
-      _timeToLive <= 86400,
-      "RAHATDAO_ERC20: Time To Live should be less than 24 hours"
+      _timeToLive <= 3600,
+      "RAHATDAO_ERC20: Time To Live should be less than 1 hour"
     );
     require(
-      block.timestamp <= ac.date + 86400,
-      "RAHATDAO_ERC20: Claim is older than 24 hours"
+      block.timestamp <= ac.expireOn + 3600,
+      "RAHATDAO_ERC20: Claim is older than 1 hour"
     );
-    require(!ac.isReleased, "RAHATDAO_ERC20: Claim has already been released.");
+    require(!ac.isApproved, "RAHATDAO_ERC20: Claim has already been released.");
     ac.otpHash = _otpHash;
-    ac.isReleased = true;
-    ac.date = block.timestamp + _timeToLive;
+    ac.isApproved = true;
+    ac.expireOn = block.timestamp + _timeToLive;
     emit ClaimApproved(_vendor, _address, ac.amount);
   }
 
@@ -169,17 +166,17 @@ contract RahatDAOClaim is ReentrancyGuard, IRahatDAO_ERC20 {
     OnlyVendor
   {
     Claim storage ac = claims[msg.sender][_address];
-    require(ac.date != 0, "RAHATDAO_ERC20: Claim has not been created yet");
-    require(ac.isReleased, "RAHATDAO_ERC20: Claim has not been approved.");
+    require(ac.expireOn != 0, "RAHATDAO_ERC20: Claim has not been created yet");
+    require(ac.isApproved, "RAHATDAO_ERC20: Claim has not been approved.");
     require(
-      ac.date >= block.timestamp,
+      ac.expireOn >= block.timestamp,
       "RAHATDAO_ERC20: Claim has already expired."
     );
     bytes32 otpHash = findHash(_otp);
     require(ac.otpHash == otpHash, "RAHATDAO_ERC20: OTP did not match.");
     uint256 _amount = ac.amount;
 
-    this._deductToken(ac.token, _address, _amount);
+    _deductToken(ac.token, _address, _amount);
     IERC20 token = IERC20(ac.token);
     token.transfer(msg.sender, _amount);
 
@@ -190,16 +187,12 @@ contract RahatDAOClaim is ReentrancyGuard, IRahatDAO_ERC20 {
 
   //#endregion
 
-  function deposit(
-    address _from,
-    address _token,
-    uint256 _amount
-  ) public nonReentrant {
+  function deposit(address _token, uint256 _amount) public nonReentrant {
     IERC20 token = IERC20(_token);
     token.transferFrom(msg.sender, address(this), _amount);
 
     unallocatedTokenBalance[_token] = unallocatedTokenBalance[_token] + _amount;
-    Deposit(_from, _token, _amount);
+    emit Deposit(msg.sender, _token, _amount);
   }
 
   // Private functions

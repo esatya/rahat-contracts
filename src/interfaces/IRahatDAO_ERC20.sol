@@ -7,8 +7,8 @@ interface IRahatDAO_ERC20 {
     bytes32 otpHash;
     address token;
     uint256 amount;
-    uint256 date;
-    bool isReleased;
+    uint256 expireOn;
+    bool isApproved;
   }
 
   //#region Events
@@ -40,11 +40,7 @@ interface IRahatDAO_ERC20 {
 
   //#endregion
 
-  function deposit(
-    address _from,
-    address _token,
-    uint256 _amount
-  ) external;
+  function deposit(address _token, uint256 _amount) external;
 
   // function getTokenBalanceByPhone(address _token, bytes32 _phone)
   //   external

@@ -94,22 +94,15 @@ contract RahatAgency {
     currentProjectAllocation[_project][_dao] = 0;
   }
 
-  // Misc token manage
+  //#region Token manage
 
   function burnToken(uint256 _amount) public OnlyAdmin {
     AgencyToken.burn(_amount);
   }
 
-  function transferToken(
-    address _tokenAddress,
-    address _destAddress,
-    uint256 _amount
-  ) public OnlyAdmin {
-    IRahatAgencyToken(_tokenAddress).transfer(_destAddress, _amount);
-  }
-
   function transferEther(address payable _destAddress, uint256 _amount)
     public
+    OnlyAdmin
     returns (bool)
   {
     (bool success, ) = _destAddress.call{ value: _amount }("");
@@ -121,4 +114,5 @@ contract RahatAgency {
   }
 
   receive() external payable {}
+  //#endregion
 }

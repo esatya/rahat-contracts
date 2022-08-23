@@ -4,8 +4,8 @@ pragma solidity ^0.8.0;
 
 interface IRahatDAO {
   event VendorAdded(address indexed vendorAddress);
-
   event VendorRemoved(address indexed vendorAddress);
+  event Deposit(address indexed from, address indexed token, uint256 amount);
 
   ///@notice grant a role to given account
   function checkRole(string memory _role, address _addr)
@@ -30,11 +30,6 @@ interface IRahatDAO {
 
   ///@notice lookup beneficiary phone using address (identifier)
   function getPhonefromAddress(address _beneficiary)
-    external
-    view
-    returns (bytes32);
-
-  function getBeneficiaryHash(address _beneficiary)
     external
     view
     returns (bytes32);

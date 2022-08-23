@@ -10,7 +10,6 @@ import "../interfaces/IRahatDAO_ERC20.sol";
 
 contract RahatDAO is AccessControl, IRahatDAO, ReentrancyGuard {
   mapping(address => address) public verifiedBeneficiaries;
-  mapping(address => bytes32) private beneficiaryHash;
 
   mapping(address => bool) public vendors;
   mapping(uint256 => address) public tokenManagementContracts;
@@ -83,23 +82,8 @@ contract RahatDAO is AccessControl, IRahatDAO, ReentrancyGuard {
     token.transferFrom(msg.sender, address(this), _amount);
     token.approve(_tokenMgrAddress, _amount);
     IRahatDAO_ERC20 tokenMgr = IRahatDAO_ERC20(_tokenMgrAddress);
-    tokenMgr.deposit(msg.sender, _token, _amount);
-  }
-
-  function setBeneficiaryHash(address _beneficiary, bytes32 _hash)
-    public
-    OnlySystem
-  {
-    beneficiaryHash[_beneficiary] = _hash;
-  }
-
-  function getBeneficiaryHash(address _beneficiary)
-    public
-    view
-    OnlySystem
-    returns (bytes32)
-  {
-    return beneficiaryHash[_beneficiary];
+    tokenMgr.deposit(_token, _amount);
+    emit Deposit(msg.sender, _token, _amount);
   }
 
   //#region Lookup functions

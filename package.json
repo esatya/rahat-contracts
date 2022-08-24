@@ -1,5 +1,5 @@
 {
-  "name": "lottery",
+  "name": "rahat-contracts",
   "version": "1.0.0",
   "description": "",
   "main": "truffle-config.js",
@@ -9,28 +9,25 @@
   "scripts": {
     "deploy-binance": "truffle deploy --network binance",
     "deploy-rumsanTestnet": "truffle deploy --network rumsanTestnet",
-    "verify-binance": "truffle run verify LotteryNFT@{contract-address} --network binance",
     "compile": "truffle compile",
     "test:contracts": "jest --runInBand --detectOpenHandles ./tests --coverage",
     "test": "hardhat test"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.3.1",
-    "@truffle/hdwallet-provider": "^1.4.0",
-    "coverage": "^0.4.1",
-    "dotenv": "^10.0.0",
-    "ethers": "^5.5.1",
-    "solidity": "^0.0.1",
-    "solidity-coverage": "^0.7.17",
-    "truffle": "^5.4.22",
-    "truffle-flattener": "^1.5.0"
+    "@openzeppelin/contracts": "^4.3.1"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-truffle5": "^2.0.2",
     "@nomiclabs/hardhat-web3": "^2.0.0",
-    "hardhat": "^2.7.0",
-    "truffle-plugin-verify": "^0.5.9",
-    "web3": "^1.6.1"
+    "@truffle/hdwallet-provider": "^2.0.14",
+    "coverage": "^0.4.1",
+    "dotenv": "^16.0.1",
+    "hardhat": "^2.10.2",
+    "solidity": "^0.0.1",
+    "solidity-coverage": "^0.7.21",
+    "truffle": "^5.5.27",
+    "truffle-flattener": "^1.6.0",
+    "truffle-plugin-verify": "^0.5.9"
   },
   "author": "",
   "license": "ISC"

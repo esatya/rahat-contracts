@@ -6,3 +6,4 @@ artifacts/
 coverage/
 coverage.json
 cache/
+contracts/Audit
